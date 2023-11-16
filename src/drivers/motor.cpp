@@ -13,11 +13,10 @@
 
 // Motor control tables
 static uint8_t motor_pin_table[N_POLES] = {
-    PIN_MOTOR_AP, 
-    PIN_MOTOR_BP, 
-    PIN_MOTOR_AN, 
-    PIN_MOTOR_BN
-};
+    PIN_MOTOR_AP,
+    PIN_MOTOR_BP,
+    PIN_MOTOR_AN,
+    PIN_MOTOR_BN};
 
 // Step table for motor
 static uint8_t motor_step_table[STEP_NCYCLES][N_POLES] = {
@@ -34,29 +33,37 @@ static uint8_t motor_step_table[STEP_NCYCLES][N_POLES] = {
 // Current position of the motor
 static uint8_t motor_pos = 0;
 
-void motor_init() {
-    for (int i = 0; i < N_POLES; i++) {
-        pinMode(motor_pin_table[i], OUTPUT);
-        digitalWrite(motor_pin_table[i], LOW);
-    }
+void motor_init()
+{
+  for (int i = 0; i < N_POLES; i++)
+  {
+    pinMode(motor_pin_table[i], OUTPUT);
+    digitalWrite(motor_pin_table[i], LOW);
+  }
 }
 
-void motor_step(bool forward) {
-    for (int i = 0; i < N_POLES; i++) {
-        digitalWrite(motor_pin_table[i], motor_step_table[motor_pos][i]);
-    }
-    motor_pos = motor_pos + (forward ? 1 : -1) % STEP_NCYCLES;
-    delayMicroseconds(MOTOR_DELAY);
+void motor_step(bool forward)
+{
+  for (int i = 0; i < N_POLES; i++)
+  {
+    digitalWrite(motor_pin_table[i], motor_step_table[motor_pos][i]);
+  }
+  motor_pos = motor_pos + (forward ? 1 : -1) % STEP_NCYCLES;
+  delayMicroseconds(MOTOR_DELAY);
 }
 
-void motor_run(int steps, bool forward = true) {
-    while (steps--) {
-        motor_step(forward);
-    }
+void motor_run(int steps, bool forward = true)
+{
+  while (steps--)
+  {
+    motor_step(forward);
+  }
 }
 
-void motor_stop() {
-    for (int i = 0; i < N_POLES; i++) {
-        digitalWrite(motor_pin_table[i], LOW);
-    }
+void motor_stop()
+{
+  for (int i = 0; i < N_POLES; i++)
+  {
+    digitalWrite(motor_pin_table[i], LOW);
+  }
 }

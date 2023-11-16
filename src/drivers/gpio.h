@@ -13,6 +13,11 @@ void gpio_init();
 void gpio_led_on();
 void gpio_led_off();
 void gpio_led_set_status(LED_STATUS status);
+
+void gpio_heater_init();
+void gpio_heater_power_on();
+void gpio_heater_power_off();
+
 void gpio_button_init();
 int gpio_paper_check();
 
