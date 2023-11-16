@@ -42,21 +42,13 @@ void motor_init()
   }
 }
 
-void motor_step(bool forward)
-{
-  for (int i = 0; i < N_POLES; i++)
-  {
-    digitalWrite(motor_pin_table[i], motor_step_table[motor_pos][i]);
-  }
-  motor_pos = motor_pos + (forward ? 1 : -1) % STEP_NCYCLES;
-  delayMicroseconds(MOTOR_DELAY);
-}
-
-void motor_run(int steps, bool forward = true)
-{
-  while (steps--)
-  {
-    motor_step(forward);
+void motor_run(int steps) {
+  while (steps--) {
+    for (int i = 0; i < N_POLES; i++) {
+      digitalWrite(motor_pin_table[i], motor_step_table[motor_pos][i]);
+    }
+    motor_pos = (motor_pos + 1) % STEP_NCYCLES;
+    delayMicroseconds(MOTOR_DELAY);
   }
 }
 

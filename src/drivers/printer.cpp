@@ -1,15 +1,15 @@
 #include <Arduino.h>
 
-#include "drivers/adc.h"
-#include "drivers/gpio.h"
-#include "drivers/motor.h"
-#include "drivers/phead.h"
+#include "drivers/printer.h"
 
 void printer_init()
 {
     phead_init();
 }
 
-void printer_send(uint8_t *data) {
-    phead_draw_line(data, NBYTES_PER_LINE);
+void printer_send(uint8_t data[MAX_NLINES][NBYTES_PER_LINE], uint16_t nlines)
+{
+    for (uint16_t line = 0; line < nlines; line++) {
+        phead_draw_line(data[line], NBYTES_PER_LINE);
+    }
 }
