@@ -42,7 +42,7 @@ pio test -e native
 ## BLE
 
 The firmware exposes the existing service and characteristic UUIDs. Writes use
-the framed print protocol documented in `docs/protocol.md`. The same
+the framed print protocol documented in [`../docs/protocol.md`](../docs/protocol.md). The same
 characteristic returns/notifications status frames.
 
 ## Wi-Fi
