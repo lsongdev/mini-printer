@@ -152,7 +152,7 @@ async function refreshStatus(){
     $("scan").disabled=!setupMode;
     $("connect").disabled=!setupMode;
     $("forget").disabled=!setupMode||!s.wifi.saved_ssid;
-    $("print").disabled=setupMode||!raster;
+    $("print").disabled=!raster;
   }catch(e){
     $("printerStatus").textContent="Status unavailable";
   }
@@ -197,7 +197,7 @@ function renderFile(file){
       raster.push(line);
     }
     ctx.putImageData(image,0,0);
-    $("print").disabled=setupMode;
+    $("print").disabled=false;
     URL.revokeObjectURL(url);
   };
   img.onerror=()=> {
@@ -229,7 +229,6 @@ function printStream(){
 
 $("print").onclick=async()=>{
   if(!raster) return;
-  if(setupMode){ setMessage("Printing is unavailable during Wi-Fi setup",true); return; }
   $("print").disabled=true;
   setMessage("Submitting print job...");
   try{
@@ -660,13 +659,6 @@ bool http_print_command(
 
 esp_err_t print_handler(httpd_req_t *req)
 {
-    if (wifi_manager_setup_active())
-        return send_text(
-            req,
-            "503 Service Unavailable",
-            "text/plain",
-            "printing is unavailable during Wi-Fi setup");
-
     if (req->content_len == 0)
         return send_text(
             req,
