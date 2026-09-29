@@ -49,8 +49,8 @@ python3 -m unittest discover -s python -p 'test_*.py'
 Print data uses the project's compact `MP` frame protocol. The firmware accepts
 the same protocol over BLE, raw TCP port `9100`, and HTTP `POST /api/print`.
 
-Wi-Fi runs as AP+STA. Connecting to `Mini-Printer-XXXX` opens an offline setup
-and print page on port 80. The page can join another Wi-Fi network while keeping
+Wi-Fi runs as AP+STA. Connect to `Mini-Printer-XXXX` and open
+`http://192.168.4.1/` for the offline setup and print page. The page can join another Wi-Fi network while keeping
 the setup AP available, and can rasterize an image in the browser for printing.
 
 The TCP endpoint is not IPP or AirPrint. See [`docs/protocol.md`](docs/protocol.md)

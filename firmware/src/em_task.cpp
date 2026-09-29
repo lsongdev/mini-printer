@@ -2,6 +2,7 @@
 
 #include "core/print_service.h"
 #include "core/test_page.h"
+#include "em_config.h"
 #include "em_device.h"
 #include "hal/em_adc.h"
 #include "hal/em_button.h"
@@ -10,7 +11,9 @@
 #include "hal/em_printer.h"
 #include "network/web_server.h"
 #include "network/wifi_manager.h"
+#if BLE_ENABLED
 #include "transport/ble_transport.h"
+#endif
 #include "transport/tcp_transport.h"
 
 #include <atomic>
@@ -103,7 +106,9 @@ void init_key()
 void task_report(void *)
 {
     TickType_t last_sensor = xTaskGetTickCount();
+#if BLE_ENABLED
     TickType_t last_status = 0;
+#endif
 
     for (;;)
     {
@@ -133,14 +138,18 @@ void task_report(void *)
                 print_service_feed_stop(0);
             }
 
+#if BLE_ENABLED
             ble_transport_report_status();
+#endif
         }
 
+#if BLE_ENABLED
         if (now - last_status >= pdMS_TO_TICKS(1000))
         {
             ble_transport_report_status();
             last_status = now;
         }
+#endif
 
         vTaskDelay(pdMS_TO_TICKS(50));
     }
@@ -174,7 +183,11 @@ void init_task()
     }
 
     init_key();
+#if BLE_ENABLED
     init_ble_transport();
+#else
+    Serial.println("BLE disabled at build time");
+#endif
 
     if (wifi_manager_init())
     {

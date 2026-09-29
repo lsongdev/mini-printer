@@ -15,7 +15,6 @@ HTTP /api/print┘                      │
                                   FreeRTOS queue
 
 Wi-Fi AP+STA ── wifi_manager
-                  ├── captive DNS
                   ├── mDNS
                   ├── TCP :9100
                   └── HTTP :80
@@ -25,7 +24,7 @@ Wi-Fi AP+STA ── wifi_manager
 - `core/` owns print jobs, session ownership, and the bounded FreeRTOS queue.
 - `protocol/` parses a transport-independent byte stream.
 - `transport/` adapts BLE and raw TCP to the same MP protocol.
-- `network/` owns Wi-Fi state, captive setup, and the HTTP UI/API.
+- `network/` owns Wi-Fi state, AP setup, and the HTTP UI/API.
 
 The print service streams lines through a 16-entry queue instead of buffering a
 whole image in RAM.
@@ -40,6 +39,11 @@ pio test -e native
 ```
 
 ## BLE
+
+The default `esp32dev` build currently sets `BLE_ENABLED=0` and excludes the
+BLE source file to isolate Wi-Fi behavior. Build `esp32dev_ble` to restore the
+BLE transport. The default build does not initialize Bluetooth or advertise
+a BLE service.
 
 The firmware exposes the existing service and characteristic UUIDs. Writes use
 the framed print protocol documented in [`../docs/protocol.md`](../docs/protocol.md). The same
@@ -59,15 +63,19 @@ Mini-Printer-XXXX
 where `XXXX` is derived from the ESP32 ID. Development builds use an open AP
 unless `WIFI_AP_PASSWORD` is configured.
 
-The printer stores STA credentials only after a successful connection. They are
-kept in NVS through `Preferences`. Failed setup attempts are not persisted.
+The printer stores STA credentials as one NVS record only after a successful
+connection. A failed save is reported to the browser. Saved credentials are
+restored on restart; credentials from earlier firmware releases are still read.
+Failed setup attempts are not persisted.
 
 The printer exposes:
 
 - HTTP on port `80`
 - MP protocol over raw TCP on port `9100`
 - mDNS as `mini-printer-xxxx.local`
-- captive DNS on the setup AP
+
+Connect to `Mini-Printer-XXXX` and open `http://192.168.4.1/` in a browser.
+The setup AP does not redirect other hostnames.
 
 The TCP service is not IPP, AirPrint, JetDirect, or ESC/POS. It carries the
 project's MP framing protocol.
@@ -77,11 +85,12 @@ project's MP framing protocol.
 Opening the printer over HTTP shows a fully offline page embedded in firmware.
 It does not depend on a CDN or Internet access.
 
-The page can:
+The page has separate Print and Wi-Fi tabs. It can:
 
 - show printer and Wi-Fi status
 - scan nearby Wi-Fi networks
 - connect to or forget a saved Wi-Fi network
+- show which network is saved for restart
 - select an image and print it
 
 Image rasterization happens in the browser. Canvas scales the source image to

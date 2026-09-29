@@ -4,17 +4,67 @@
 
 #if WIFI_ENABLED
 
-#include <DNSServer.h>
 #include <ESPmDNS.h>
 #include <Preferences.h>
 #include <WiFi.h>
+#include <esp_wifi.h>
 
 namespace {
-DNSServer dns_server;
 Preferences preferences;
 char ap_ssid[33] = {};
 char hostname[33] = {};
+char saved_ssid[33] = {};
 bool initialized = false;
+
+constexpr char CREDENTIALS_KEY[] = "network";
+constexpr uint8_t CREDENTIALS_VERSION = 1;
+
+struct saved_network_t {
+    uint8_t version;
+    char ssid[33];
+    char password[65];
+};
+
+bool valid_network(const saved_network_t &network)
+{
+    return network.version == CREDENTIALS_VERSION &&
+           network.ssid[0] != '\0' &&
+           memchr(network.ssid, '\0', sizeof(network.ssid)) != nullptr &&
+           memchr(network.password, '\0', sizeof(network.password)) != nullptr;
+}
+
+bool read_saved_network(saved_network_t *network)
+{
+    if (network == nullptr ||
+        !preferences.begin(WIFI_PREFS_NAMESPACE, true))
+        return false;
+
+    *network = {};
+    bool loaded = false;
+
+    if (preferences.isKey(CREDENTIALS_KEY))
+    {
+        loaded = preferences.getBytesLength(CREDENTIALS_KEY) == sizeof(*network) &&
+                 preferences.getBytes(CREDENTIALS_KEY, network, sizeof(*network)) == sizeof(*network) &&
+                 valid_network(*network);
+    }
+    if (!loaded && preferences.isKey("ssid"))
+    {
+        // Read credentials saved by earlier firmware releases.
+        const String ssid = preferences.getString("ssid");
+        const String password = preferences.getString("password");
+        if (ssid.length() > 0 && ssid.length() <= 32 && password.length() <= 64)
+        {
+            network->version = CREDENTIALS_VERSION;
+            strlcpy(network->ssid, ssid.c_str(), sizeof(network->ssid));
+            strlcpy(network->password, password.c_str(), sizeof(network->password));
+            loaded = true;
+        }
+    }
+
+    preferences.end();
+    return loaded;
+}
 
 void make_names()
 {
@@ -37,55 +87,56 @@ void make_names()
 
 void connect_saved_network()
 {
-    if (!preferences.begin(WIFI_PREFS_NAMESPACE, true))
+    saved_network_t network = {};
+    if (!read_saved_network(&network))
         return;
 
-    const String ssid = preferences.getString("ssid");
-    const String password = preferences.getString("password");
-    preferences.end();
-
-    if (ssid.length() == 0)
-        return;
-
-    Serial.printf("Connecting to saved Wi-Fi: %s\n", ssid.c_str());
-    WiFi.begin(ssid.c_str(), password.c_str());
+    strlcpy(saved_ssid, network.ssid, sizeof(saved_ssid));
+    Serial.printf("Connecting to saved Wi-Fi: %s\n", network.ssid);
+    WiFi.begin(network.ssid, network.password);
 }
 
-void dns_task(void *)
+void on_wifi_event(arduino_event_id_t event)
 {
-    for (;;)
+    switch (event)
     {
-        dns_server.processNextRequest();
-        vTaskDelay(pdMS_TO_TICKS(10));
+    case ARDUINO_EVENT_WIFI_AP_STACONNECTED:
+        Serial.println("Wi-Fi AP client connected");
+        break;
+    case ARDUINO_EVENT_WIFI_AP_STAIPASSIGNED:
+        Serial.println("Wi-Fi AP client received an IP address");
+        break;
+    case ARDUINO_EVENT_WIFI_AP_STADISCONNECTED:
+        Serial.println("Wi-Fi AP client disconnected");
+        break;
+    default:
+        break;
     }
 }
 
 bool save_credentials(const char *ssid, const char *password)
 {
+    saved_network_t network = {};
+    network.version = CREDENTIALS_VERSION;
+    if (strlcpy(network.ssid, ssid, sizeof(network.ssid)) >= sizeof(network.ssid) ||
+        strlcpy(network.password, password == nullptr ? "" : password, sizeof(network.password)) >= sizeof(network.password))
+        return false;
+
     if (!preferences.begin(WIFI_PREFS_NAMESPACE, false))
         return false;
 
-    const char *saved_password = password == nullptr ? "" : password;
-    const size_t ssid_written = preferences.putString("ssid", ssid);
-    const size_t password_written =
-        preferences.putString("password", saved_password);
-
+    const bool saved = preferences.putBytes(CREDENTIALS_KEY, &network, sizeof(network)) == sizeof(network);
     preferences.end();
-    return ssid_written == strlen(ssid) &&
-           password_written == strlen(saved_password);
+    if (saved)
+        strlcpy(saved_ssid, network.ssid, sizeof(saved_ssid));
+    return saved;
 }
 
 void restore_saved_network()
 {
-    if (!preferences.begin(WIFI_PREFS_NAMESPACE, true))
-        return;
-
-    const String ssid = preferences.getString("ssid");
-    const String password = preferences.getString("password");
-    preferences.end();
-
-    if (ssid.length() != 0)
-        WiFi.begin(ssid.c_str(), password.c_str());
+    saved_network_t network = {};
+    if (read_saved_network(&network))
+        WiFi.begin(network.ssid, network.password);
 }
 } // namespace
 
@@ -96,19 +147,31 @@ bool wifi_manager_init()
 
     make_names();
 
-    WiFi.mode(WIFI_AP_STA);
+    WiFi.onEvent(on_wifi_event);
+    WiFi.setHostname(hostname);
+
+    if (!WiFi.mode(WIFI_AP_STA))
+    {
+        Serial.println("Failed to initialize Wi-Fi AP+STA mode");
+        return false;
+    }
 
     // ESP32 Wi-Fi and Bluetooth share the 2.4 GHz radio. The coexistence
     // controller requires Wi-Fi modem sleep; WIFI_PS_NONE causes an abort
     // as soon as both stacks are enabled.
-    if (!WiFi.setSleep(true))
+    // Arduino's WiFi.setSleep() returns false when the requested mode is
+    // already selected, which is the default on ESP32. Check the driver
+    // operation itself so an unchanged setting is not treated as a failure.
+    const esp_err_t sleep_result = esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
+    if (sleep_result != ESP_OK)
     {
-        Serial.println("Failed to enable Wi-Fi modem sleep");
+        Serial.printf(
+            "Failed to enable Wi-Fi modem sleep: %s\n",
+            esp_err_to_name(sleep_result));
         return false;
     }
 
     WiFi.setAutoReconnect(true);
-    WiFi.setHostname(hostname);
 
     // Preferences is the source of truth. Clear the Arduino Wi-Fi driver's
     // remembered STA credentials so a failed setup attempt cannot survive a
@@ -126,8 +189,6 @@ bool wifi_manager_init()
         Serial.println("Failed to start Wi-Fi AP");
         return false;
     }
-
-    dns_server.start(53, "*", WiFi.softAPIP());
 
     if (MDNS.begin(hostname))
     {
@@ -147,30 +208,17 @@ bool wifi_manager_init()
 
     connect_saved_network();
 
-    if (xTaskCreate(
-            dns_task,
-            "CaptiveDNS",
-            3072,
-            nullptr,
-            1,
-            nullptr) != pdPASS)
-    {
-        // Captive DNS is a convenience. HTTP and TCP remain useful even if
-        // the task cannot be created.
-        Serial.println("Failed to start captive DNS task");
-    }
-
     initialized = true;
     return true;
 }
 
-bool wifi_manager_connect(
+wifi_connect_result_e wifi_manager_connect(
     const char *ssid,
     const char *password,
     uint32_t timeout_ms)
 {
     if (!initialized || ssid == nullptr || ssid[0] == '\0')
-        return false;
+        return wifi_connect_result_e::connection_failed;
 
     // Force a real transition even if STA is already connected; otherwise
     // WL_CONNECTED can briefly describe the previous network and make a new
@@ -186,37 +234,45 @@ bool wifi_manager_connect(
         {
             WiFi.disconnect(false, true);
             restore_saved_network();
-            return false;
+            return wifi_connect_result_e::connection_failed;
         }
 
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 
     if (!save_credentials(ssid, password))
+    {
         Serial.println("Wi-Fi connected, but credentials could not be saved");
+        return wifi_connect_result_e::save_failed;
+    }
 
     Serial.printf(
         "Wi-Fi STA connected: %s, IP=%s\n",
         WiFi.SSID().c_str(),
         WiFi.localIP().toString().c_str());
 
-    return true;
+    return wifi_connect_result_e::connected_and_saved;
 }
 
-void wifi_manager_forget()
+bool wifi_manager_forget()
 {
-    if (preferences.begin(WIFI_PREFS_NAMESPACE, false))
-    {
-        preferences.clear();
-        preferences.end();
-    }
+    if (!preferences.begin(WIFI_PREFS_NAMESPACE, false))
+        return false;
 
+    const bool cleared = preferences.clear();
+    preferences.end();
+    if (!cleared)
+        return false;
+
+    saved_ssid[0] = '\0';
     WiFi.disconnect(false, true);
+    return true;
 }
 
 wifi_status_t wifi_manager_status()
 {
     wifi_status_t status = {};
+    strlcpy(status.saved_ssid, saved_ssid, sizeof(status.saved_ssid));
     status.connected = WiFi.status() == WL_CONNECTED;
 
     if (!status.connected)
@@ -246,13 +302,14 @@ bool wifi_manager_init()
     return false;
 }
 
-bool wifi_manager_connect(const char *, const char *, uint32_t)
+wifi_connect_result_e wifi_manager_connect(const char *, const char *, uint32_t)
 {
-    return false;
+    return wifi_connect_result_e::connection_failed;
 }
 
-void wifi_manager_forget()
+bool wifi_manager_forget()
 {
+    return false;
 }
 
 wifi_status_t wifi_manager_status()

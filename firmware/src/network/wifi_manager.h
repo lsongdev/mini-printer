@@ -6,13 +6,20 @@
 typedef struct {
     bool connected;
     char ssid[33];
+    char saved_ssid[33];
     IPAddress ip;
     int32_t rssi;
 } wifi_status_t;
 
+enum class wifi_connect_result_e {
+    connected_and_saved,
+    connection_failed,
+    save_failed,
+};
+
 bool wifi_manager_init();
-bool wifi_manager_connect(const char *ssid, const char *password, uint32_t timeout_ms);
-void wifi_manager_forget();
+wifi_connect_result_e wifi_manager_connect(const char *ssid, const char *password, uint32_t timeout_ms);
+bool wifi_manager_forget();
 wifi_status_t wifi_manager_status();
 
 const char *wifi_manager_ap_ssid();

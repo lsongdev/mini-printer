@@ -25,25 +25,48 @@ constexpr char INDEX_HTML[] = R"WEB(
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mini Printer</title>
 <style>
-body{font:16px system-ui,sans-serif;max-width:720px;margin:auto;padding:20px;background:#f6f6f6;color:#111}
-section{background:#fff;border:1px solid #ddd;border-radius:12px;padding:16px;margin:0 0 16px}
-h1,h2{margin:0 0 12px}label{display:block;margin:10px 0 4px}
-button,input,select{font:inherit;padding:9px;box-sizing:border-box}
-button{cursor:pointer}select,input[type=password]{width:100%}
-.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
-small,#message{color:#555}.ok{color:#176b2c}.bad{color:#a11}
-#status{white-space:pre-line}
-canvas{width:100%;max-width:384px;background:white;border:1px solid #ddd;image-rendering:pixelated}
-code{word-break:break-all}
+*{box-sizing:border-box}
+body{max-width:720px;margin:0 auto;padding:16px;background:#f6f7f9;color:#17212b;font:16px/1.5 system-ui,sans-serif}
+.page-header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:4px 0 16px}
+h1{font-size:1.7rem;margin:0}h2{font-size:1.1rem;margin:0 0 12px}
+.page-nav{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:16px;white-space:nowrap}
+.page-nav a{color:#1769c2;text-decoration:none}
+.page-nav a:hover,.page-nav a:focus-visible,.page-nav a[aria-current=page]{text-decoration:underline}
+section{min-width:0;background:#fff;border:1px solid #dce1e7;border-radius:12px;padding:16px;margin:0 0 16px}
+.status-grid{display:grid;grid-template-columns:minmax(0,40%) minmax(0,60%);margin:0}
+.status-grid dt,.status-grid dd{padding:9px 0;border-bottom:1px solid #edf0f3;min-width:0}
+.status-grid dt{color:#5b6570}.status-grid dd{margin:0;text-align:right;overflow-wrap:anywhere}
+.status-grid dt:last-of-type,.status-grid dd:last-of-type{border-bottom:0}
+[hidden]{display:none!important}
+button,input,select{font:inherit;max-width:100%}
+button{min-height:44px;padding:9px 12px;cursor:pointer;border:1px solid #c9d2dc;border-radius:8px;background:#fff}
+button:disabled{cursor:default;opacity:.55}
+label{display:block;margin:12px 0 5px}
+input[type=file],input[type=password],input[type=range],select{display:block;width:100%;min-width:0}
+input[type=password],select{min-height:44px;padding:8px;border:1px solid #c9d2dc;border-radius:8px;background:#fff}
+.action-button{display:block;width:100%;margin-top:12px;border:0;border-radius:9px;background:#e8edf3;color:#344054}
+.action-button.primary{background:#1769c2;color:#fff}
+canvas{display:block;max-width:100%;height:auto;background:#fff;border:1px solid #dce1e7;image-rendering:pixelated}
+#message{min-height:24px;margin:0 0 12px;overflow-wrap:anywhere}
+small{display:block;margin-top:12px;color:#5b6570}
+.ok{color:#176b2c}.bad{color:#a11}
 </style>
 </head>
 <body>
+<header class="page-header">
 <h1>Mini Printer</h1>
-<section>
-<h2>Status</h2>
-<div id="status">Loading...</div>
+<nav class="page-nav" aria-label="Pages">
+<a id="print-link" href="#print" aria-current="page">Print</a>
+<a id="wifi-link" href="#wifi">Wi-Fi</a>
+</nav>
+</header>
+<section aria-labelledby="status-heading">
+<h2 id="status-heading">Status</h2>
+<dl id="printerStatus" class="status-grid">Loading...</dl>
 </section>
+<p id="message" role="status" aria-live="polite"></p>
 
+<div id="print-panel" aria-labelledby="print-link">
 <section>
 <h2>Print image</h2>
 <input id="file" type="file" accept="image/*">
@@ -52,25 +75,23 @@ code{word-break:break-all}
 <label>Density <span id="densityValue">64</span>%</label>
 <input id="density" type="range" min="1" max="100" value="64">
 <p><canvas id="preview" width="384" height="1"></canvas></p>
-<button id="print" disabled>Print</button>
+<button id="print" class="action-button primary" disabled>Print</button>
 </section>
-
-<section>
-<h2>Wi-Fi</h2>
-<div class="row">
-<select id="networks"><option value="">Scan for networks</option></select>
-<button id="scan">Scan</button>
 </div>
-<label>Password</label>
-<input id="password" type="password" autocomplete="current-password">
-<p class="row">
-<button id="connect">Connect</button>
-<button id="forget">Forget saved Wi-Fi</button>
-</p>
-<small>The setup access point stays available after the printer joins another Wi-Fi network.</small>
-</section>
 
-<p id="message"></p>
+<div id="wifi-panel" aria-labelledby="wifi-link" hidden>
+<section>
+<h2>Connect to Wi-Fi</h2>
+<label for="networks">Network</label>
+<select id="networks"><option value="">Scan for networks</option></select>
+<button id="scan" class="action-button">Scan</button>
+<label for="password">Password</label>
+<input id="password" type="password" autocomplete="current-password">
+<button id="connect" class="action-button primary">Connect &amp; save</button>
+<button id="forget" class="action-button">Forget saved Wi-Fi</button>
+<small>Credentials are saved after a successful connection and restored on restart. The setup AP stays available.</small>
+</section>
+</div>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -81,23 +102,47 @@ function setMessage(text,bad=false){
   $("message").className=bad?"bad":"ok";
 }
 
+function selectTab(name){
+  for(const tabName of ["print","wifi"]){
+    const active=tabName===name;
+    if(active) $(tabName+"-link").setAttribute("aria-current","page");
+    else $(tabName+"-link").removeAttribute("aria-current");
+    $(tabName+"-panel").hidden=!active;
+  }
+}
+
+window.addEventListener("hashchange",()=>selectTab(location.hash==="#wifi"?"wifi":"print"));
+selectTab(location.hash==="#wifi"?"wifi":"print");
+
+function setStatusRows(id,rows){
+  const list=$(id);
+  list.replaceChildren();
+  for(const [label,value] of rows){
+    const name=document.createElement("dt");
+    const detail=document.createElement("dd");
+    name.textContent=label;
+    detail.textContent=value;
+    list.append(name,detail);
+  }
+}
+
 async function refreshStatus(){
   try{
     const s=await fetch("/api/status",{cache:"no-store"}).then(r=>r.json());
-    const temp=s.temperature===255?"invalid":s.temperature+" °C";
-    const sta=s.wifi.connected
-      ? s.wifi.ssid+" · "+s.wifi.ip+" · "+s.wifi.rssi+" dBm"
-      : "not connected";
-    $("status").textContent=
-      "Battery: "+s.battery+"%\n"+
-      "Temperature: "+temp+"\n"+
-      "Paper: "+(s.paper?"ready":"missing")+"\n"+
-      "Printer: "+s.printer+"\n"+
-      "Setup AP: "+s.wifi.ap_ssid+"\n"+
-      "LAN: "+sta+"\n"+
-      "mDNS: http://"+s.wifi.hostname+".local/";
+    setStatusRows("printerStatus",[
+      ["Battery",s.battery+"%"],
+      ["Print head",s.temperature===255?"Unavailable":s.temperature+" °C"],
+      ["Paper",s.paper?"Ready":"Missing"],
+      ["Printer",s.printer],
+      ["Saved network",s.wifi.saved_ssid||"None"],
+      ["Connection",s.wifi.connected?s.wifi.ssid:"Not connected"],
+      ["IP address",s.wifi.connected?s.wifi.ip:"—"],
+      ["Signal",s.wifi.connected?s.wifi.rssi+" dBm":"—"],
+      ["Setup AP",s.wifi.ap_ssid],
+      ["Device URL","http://"+s.wifi.hostname+".local/"]
+    ]);
   }catch(e){
-    $("status").textContent="Status unavailable";
+    $("printerStatus").textContent="Status unavailable";
   }
 }
 
@@ -222,14 +267,14 @@ $("connect").onclick=async()=>{
   const ssid=$("networks").value;
   if(!ssid){ setMessage("Select a Wi-Fi network first",true); return; }
   $("connect").disabled=true;
-  setMessage("Connecting to "+ssid+"...");
+  setMessage("Connecting to "+ssid+" and saving credentials...");
   try{
     const body=new URLSearchParams({ssid:ssid,password:$("password").value});
     const r=await fetch("/api/wifi/connect",{method:"POST",body:body});
-    const text=await r.text();
-    if(!r.ok) throw new Error(text||("HTTP "+r.status));
-    setMessage("Connected to "+ssid);
-    refreshStatus();
+    if(!r.ok) throw new Error(await r.text()||("HTTP "+r.status));
+    const result=await r.json();
+    setMessage("Connected to "+result.ssid+" and saved. IP: "+result.ip);
+    await refreshStatus();
   }catch(e){
     setMessage("Wi-Fi connection failed: "+e.message,true);
   }finally{
@@ -238,9 +283,14 @@ $("connect").onclick=async()=>{
 };
 
 $("forget").onclick=async()=>{
-  const r=await fetch("/api/wifi/forget",{method:"POST"});
-  if(r.ok){ setMessage("Saved Wi-Fi forgotten"); refreshStatus(); }
-  else setMessage("Could not forget Wi-Fi",true);
+  try{
+    const r=await fetch("/api/wifi/forget",{method:"POST"});
+    if(!r.ok) throw new Error(await r.text()||("HTTP "+r.status));
+    setMessage("Saved Wi-Fi forgotten");
+    await refreshStatus();
+  }catch(e){
+    setMessage("Could not forget Wi-Fi: "+e.message,true);
+  }
 };
 
 refreshStatus();
@@ -386,9 +436,13 @@ bool form_value(
 
 esp_err_t index_handler(httpd_req_t *req)
 {
+    Serial.println("HTTP GET /");
     httpd_resp_set_type(req, "text/html; charset=utf-8");
     httpd_resp_set_hdr(req, "Cache-Control", "no-store");
-    return httpd_resp_send(req, INDEX_HTML, HTTPD_RESP_USE_STRLEN);
+    const esp_err_t result = httpd_resp_send(req, INDEX_HTML, HTTPD_RESP_USE_STRLEN);
+    if (result != ESP_OK)
+        Serial.printf("HTTP GET / failed: %s\n", esp_err_to_name(result));
+    return result;
 }
 
 esp_err_t status_handler(httpd_req_t *req)
@@ -408,6 +462,7 @@ esp_err_t status_handler(httpd_req_t *req)
         ",\"ssid\":\"" + ssid + "\"" +
         ",\"ip\":\"" + ip + "\"" +
         ",\"rssi\":" + wifi.rssi +
+        ",\"saved_ssid\":\"" + json_escape(String(wifi.saved_ssid)) + "\"" +
         ",\"ap_ssid\":\"" + json_escape(String(wifi_manager_ap_ssid())) + "\"" +
         ",\"hostname\":\"" + json_escape(String(wifi_manager_hostname())) + "\"}}";
 
@@ -484,10 +539,11 @@ esp_err_t wifi_connect_handler(httpd_req_t *req)
             "ssid or password is too long");
     }
 
-    if (!wifi_manager_connect(
-            ssid,
-            password,
-            WIFI_CONNECT_TIMEOUT_MS))
+    const wifi_connect_result_e result = wifi_manager_connect(
+        ssid,
+        password,
+        WIFI_CONNECT_TIMEOUT_MS);
+    if (result == wifi_connect_result_e::connection_failed)
     {
         return send_text(
             req,
@@ -495,10 +551,18 @@ esp_err_t wifi_connect_handler(httpd_req_t *req)
             "text/plain",
             "could not connect");
     }
+    if (result == wifi_connect_result_e::save_failed)
+    {
+        return send_text(
+            req,
+            "500 Internal Server Error",
+            "text/plain",
+            "connected, but could not save Wi-Fi credentials");
+    }
 
     const wifi_status_t wifi = wifi_manager_status();
     const String json =
-        String("{\"connected\":true,\"ssid\":\"") +
+        String("{\"connected\":true,\"saved\":true,\"ssid\":\"") +
         json_escape(String(wifi.ssid)) +
         "\",\"ip\":\"" + wifi.ip.toString() + "\"}";
 
@@ -507,10 +571,9 @@ esp_err_t wifi_connect_handler(httpd_req_t *req)
 
 esp_err_t wifi_forget_handler(httpd_req_t *req)
 {
-    const esp_err_t result =
-        send_text(req, "200 OK", "application/json", "{\"ok\":true}");
-    wifi_manager_forget();
-    return result;
+    if (!wifi_manager_forget())
+        return send_text(req, "500 Internal Server Error", "text/plain", "could not forget saved Wi-Fi");
+    return send_text(req, "200 OK", "application/json", "{\"ok\":true}");
 }
 
 bool http_print_command(
@@ -671,6 +734,7 @@ bool init_web_server()
     config.server_port = WIFI_HTTP_PORT;
     config.uri_match_fn = httpd_uri_match_wildcard;
     config.stack_size = 8192;
+    config.lru_purge_enable = true;
 
     if (httpd_start(&server, &config) != ESP_OK)
     {

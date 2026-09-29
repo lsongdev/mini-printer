@@ -1,3 +1,7 @@
+#include "em_config.h"
+
+#if BLE_ENABLED
+
 #include "ble_transport.h"
 
 #include "core/print_service.h"
@@ -191,3 +195,5 @@ void ble_transport_report_status()
     if (connected.load())
         set_status_value(true);
 }
+
+#endif // BLE_ENABLED
