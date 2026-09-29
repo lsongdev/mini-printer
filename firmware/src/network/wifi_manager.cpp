@@ -65,12 +65,14 @@ bool save_credentials(const char *ssid, const char *password)
     if (!preferences.begin(WIFI_PREFS_NAMESPACE, false))
         return false;
 
-    const bool ok =
-        preferences.putString("ssid", ssid) > 0 &&
-        preferences.putString("password", password == nullptr ? "" : password) >= 0;
+    const char *saved_password = password == nullptr ? "" : password;
+    const size_t ssid_written = preferences.putString("ssid", ssid);
+    const size_t password_written =
+        preferences.putString("password", saved_password);
 
     preferences.end();
-    return ok;
+    return ssid_written == strlen(ssid) &&
+           password_written == strlen(saved_password);
 }
 
 void restore_saved_network()
@@ -98,6 +100,11 @@ bool wifi_manager_init()
     WiFi.setSleep(false);
     WiFi.setAutoReconnect(true);
     WiFi.setHostname(hostname);
+
+    // Preferences is the source of truth. Clear the Arduino Wi-Fi driver's
+    // remembered STA credentials so a failed setup attempt cannot survive a
+    // reboot independently of our validated credentials.
+    WiFi.disconnect(false, true);
 
     bool ap_started = false;
     if (strlen(WIFI_AP_PASSWORD) >= 8)
@@ -162,7 +169,7 @@ bool wifi_manager_connect(
     {
         if (static_cast<uint32_t>(millis() - started) >= timeout_ms)
         {
-            WiFi.disconnect(false, false);
+            WiFi.disconnect(false, true);
             restore_saved_network();
             return false;
         }
