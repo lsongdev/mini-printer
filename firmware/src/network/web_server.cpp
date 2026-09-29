@@ -399,8 +399,8 @@ esp_err_t status_handler(httpd_req_t *req)
     const String ssid = json_escape(String(wifi.ssid));
     const String ip = wifi.connected ? wifi.ip.toString() : "";
     const String json =
-        String("{\"battery\":") + state.battery +
-        ",\"temperature\":" + state.temperature +
+        String("{\"battery\":") + static_cast<int>(state.battery) +
+        ",\"temperature\":" + static_cast<int>(state.temperature) +
         ",\"paper\":" + (state.paper_state == PAPER_STATUS_NORMAL ? "true" : "false") +
         ",\"printer\":\"" + printer_state_name(state.printer_state) + "\"" +
         ",\"error\":" + static_cast<int>(state.printer_error) +
@@ -457,9 +457,11 @@ esp_err_t wifi_scan_handler(httpd_req_t *req)
 
 esp_err_t wifi_connect_handler(httpd_req_t *req)
 {
-    char body[256];
-    char ssid[33];
-    char password[65] = {};
+    // Values are URL encoded, so reserve up to three bytes of form text for
+    // every decoded byte (%XX). ESP32 Wi-Fi limits SSIDs to 32 bytes.
+    char body[384];
+    char ssid[97];
+    char password[193] = {};
 
     if (!read_body(req, body, sizeof(body)) ||
         !form_value(body, "ssid", ssid, sizeof(ssid)))
@@ -472,6 +474,15 @@ esp_err_t wifi_connect_handler(httpd_req_t *req)
     }
 
     form_value(body, "password", password, sizeof(password));
+
+    if (strlen(ssid) > 32 || strlen(password) > 64)
+    {
+        return send_text(
+            req,
+            "400 Bad Request",
+            "text/plain",
+            "ssid or password is too long");
+    }
 
     if (!wifi_manager_connect(
             ssid,
