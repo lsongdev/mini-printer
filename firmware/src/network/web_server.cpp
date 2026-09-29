@@ -82,6 +82,7 @@ small{display:block;margin-top:12px;color:#5b6570}
 <div id="wifi-panel" aria-labelledby="wifi-link" hidden>
 <section>
 <h2>Connect to Wi-Fi</h2>
+<p id="wifi-mode-note"></p>
 <label for="networks">Network</label>
 <select id="networks"><option value="">Scan for networks</option></select>
 <button id="scan" class="action-button">Scan</button>
@@ -89,13 +90,14 @@ small{display:block;margin-top:12px;color:#5b6570}
 <input id="password" type="password" autocomplete="current-password">
 <button id="connect" class="action-button primary">Connect &amp; save</button>
 <button id="forget" class="action-button">Forget saved Wi-Fi</button>
-<small>Credentials are saved after a successful connection and restored on restart. The setup AP stays available.</small>
+<small>Triple-click the printer button to enter Wi-Fi setup. The setup AP closes automatically after a successful connection.</small>
 </section>
 </div>
 
 <script>
 const $=id=>document.getElementById(id);
 let raster=null;
+let setupMode=false;
 
 function setMessage(text,bad=false){
   $("message").textContent=text;
@@ -129,18 +131,28 @@ function setStatusRows(id,rows){
 async function refreshStatus(){
   try{
     const s=await fetch("/api/status",{cache:"no-store"}).then(r=>r.json());
+    setupMode=s.wifi.setup;
     setStatusRows("printerStatus",[
       ["Battery",s.battery+"%"],
       ["Print head",s.temperature===255?"Unavailable":s.temperature+" °C"],
       ["Paper",s.paper?"Ready":"Missing"],
       ["Printer",s.printer],
+      ["Wi-Fi state",s.wifi.state],
       ["Saved network",s.wifi.saved_ssid||"None"],
       ["Connection",s.wifi.connected?s.wifi.ssid:"Not connected"],
       ["IP address",s.wifi.connected?s.wifi.ip:"—"],
       ["Signal",s.wifi.connected?s.wifi.rssi+" dBm":"—"],
-      ["Setup AP",s.wifi.ap_ssid],
-      ["Device URL","http://"+s.wifi.hostname+".local/"]
+      ["Setup AP",setupMode?s.wifi.ap_ssid:"Off"],
+      ["Device URL",s.wifi.connected?"http://"+s.wifi.hostname+".local/":"—"]
     ]);
+
+    $("wifi-mode-note").textContent=setupMode
+      ?"Setup mode is active. Choose a network below."
+      :"Setup mode is off. Triple-click the printer button to enable it.";
+    $("scan").disabled=!setupMode;
+    $("connect").disabled=!setupMode;
+    $("forget").disabled=!setupMode||!s.wifi.saved_ssid;
+    $("print").disabled=!raster;
   }catch(e){
     $("printerStatus").textContent="Status unavailable";
   }
@@ -273,8 +285,7 @@ $("connect").onclick=async()=>{
     const r=await fetch("/api/wifi/connect",{method:"POST",body:body});
     if(!r.ok) throw new Error(await r.text()||("HTTP "+r.status));
     const result=await r.json();
-    setMessage("Connected to "+result.ssid+" and saved. IP: "+result.ip);
-    await refreshStatus();
+    setMessage("Connected to "+result.ssid+" and saved. IP: "+result.ip+". Setup AP will close shortly.");
   }catch(e){
     setMessage("Wi-Fi connection failed: "+e.message,true);
   }finally{
@@ -458,7 +469,9 @@ esp_err_t status_handler(httpd_req_t *req)
         ",\"paper\":" + (state.paper_state == PAPER_STATUS_NORMAL ? "true" : "false") +
         ",\"printer\":\"" + printer_state_name(state.printer_state) + "\"" +
         ",\"error\":" + static_cast<int>(state.printer_error) +
-        ",\"wifi\":{\"connected\":" + (wifi.connected ? "true" : "false") +
+        ",\"wifi\":{\"state\":\"" + wifi_manager_state_name() + "\"" +
+        ",\"setup\":" + (wifi_manager_setup_active() ? "true" : "false") +
+        ",\"connected\":" + (wifi.connected ? "true" : "false") +
         ",\"ssid\":\"" + ssid + "\"" +
         ",\"ip\":\"" + ip + "\"" +
         ",\"rssi\":" + wifi.rssi +
@@ -472,6 +485,13 @@ esp_err_t status_handler(httpd_req_t *req)
 
 esp_err_t wifi_scan_handler(httpd_req_t *req)
 {
+    if (!wifi_manager_setup_active())
+        return send_text(
+            req,
+            "409 Conflict",
+            "text/plain",
+            "Wi-Fi setup mode is not active");
+
     const int count = WiFi.scanNetworks(false, true);
     if (count < 0)
         return send_text(
@@ -512,6 +532,13 @@ esp_err_t wifi_scan_handler(httpd_req_t *req)
 
 esp_err_t wifi_connect_handler(httpd_req_t *req)
 {
+    if (!wifi_manager_setup_active())
+        return send_text(
+            req,
+            "409 Conflict",
+            "text/plain",
+            "Wi-Fi setup mode is not active");
+
     // Values are URL encoded, so reserve up to three bytes of form text for
     // every decoded byte (%XX). ESP32 Wi-Fi limits SSIDs to 32 bytes.
     char body[384];
@@ -566,13 +593,31 @@ esp_err_t wifi_connect_handler(httpd_req_t *req)
         json_escape(String(wifi.ssid)) +
         "\",\"ip\":\"" + wifi.ip.toString() + "\"}";
 
-    return send_text(req, "200 OK", "application/json", json.c_str());
+    const esp_err_t sent =
+        send_text(req, "200 OK", "application/json", json.c_str());
+
+    if (sent == ESP_OK)
+        wifi_manager_schedule_setup_stop(WIFI_SETUP_CLOSE_DELAY_MS);
+
+    return sent;
 }
 
 esp_err_t wifi_forget_handler(httpd_req_t *req)
 {
+    if (!wifi_manager_setup_active())
+        return send_text(
+            req,
+            "409 Conflict",
+            "text/plain",
+            "Wi-Fi setup mode is not active");
+
     if (!wifi_manager_forget())
-        return send_text(req, "500 Internal Server Error", "text/plain", "could not forget saved Wi-Fi");
+        return send_text(
+            req,
+            "500 Internal Server Error",
+            "text/plain",
+            "could not forget saved Wi-Fi");
+
     return send_text(req, "200 OK", "application/json", "{\"ok\":true}");
 }
 
@@ -706,6 +751,9 @@ esp_err_t print_handler(httpd_req_t *req)
 
 esp_err_t captive_handler(httpd_req_t *req)
 {
+    if (!wifi_manager_setup_active())
+        return send_text(req, "404 Not Found", "text/plain", "not found");
+
     httpd_resp_set_status(req, "302 Found");
     httpd_resp_set_hdr(req, "Location", "/");
     httpd_resp_set_hdr(req, "Cache-Control", "no-store");

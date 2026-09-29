@@ -14,10 +14,9 @@ TCP :9100 ─────┼── MP protocol ── print service ── print
 HTTP /api/print┘                      │
                                   FreeRTOS queue
 
-Wi-Fi AP+STA ── wifi_manager
-                  ├── mDNS
-                  ├── TCP :9100
-                  └── HTTP :80
+Wi-Fi STA ────── wifi_manager ── HTTP :80 / TCP :9100 / mDNS
+                    │
+                    └── temporary AP+STA setup mode
 ```
 
 - `hal/` owns GPIO, SPI, motor, sensors, and print-head timing.
@@ -40,7 +39,7 @@ pio test -e native
 
 ## BLE
 
-The default `esp32dev` build enables BLE, Wi-Fi AP+STA, HTTP, and TCP together.
+The default `esp32dev` build enables BLE, Wi-Fi, HTTP, and TCP together. Normal operation uses STA only; AP+STA is enabled temporarily for provisioning and recovery.
 It starts a BLE-only controller and releases unused Bluetooth Classic controller
 memory before initializing the BLE stack.
 
@@ -60,10 +59,22 @@ characteristic returns/notifications status frames.
 
 ## Wi-Fi
 
-Wi-Fi runs in `WIFI_AP_STA` mode. The setup/recovery SoftAP remains available
-even after the printer joins another network.
+Normal operation uses `WIFI_STA` only. The setup SoftAP exists only while the
+printer is being provisioned or recovered.
 
-The AP SSID is:
+Startup behavior is:
+
+```text
+no saved network
+    -> setup AP
+
+saved network
+    -> STA connect for up to 30 seconds
+       -> success: online, STA only
+       -> failure: setup AP
+```
+
+The setup AP SSID is:
 
 ```text
 Mini-Printer-XXXX
@@ -72,19 +83,35 @@ Mini-Printer-XXXX
 where `XXXX` is derived from the ESP32 ID. Development builds use an open AP
 unless `WIFI_AP_PASSWORD` is configured.
 
-The printer stores STA credentials as one NVS record only after a successful
-connection. A failed save is reported to the browser. Saved credentials are
-restored on restart; credentials from earlier firmware releases are still read.
-Failed setup attempts are not persisted.
+A triple click on GPIO 5 requests setup mode at any time. If saved credentials
+exist, setup mode is a temporary five-minute recovery window. A first-boot
+device with no credentials remains in setup until configured. After a successful
+connection the HTTP response is sent first, then the AP closes after a short
+delay and the printer returns to STA-only operation.
 
-The printer exposes:
+While setup mode is active:
+
+- captive DNS points hostnames at the setup AP
+- `/api/wifi/scan`, `/api/wifi/connect`, and `/api/wifi/forget` are enabled
+- the embedded Web UI can still print through `POST /api/print`
+- raw MP printing on TCP port `9100` remains available
+
+The AP is still temporary; successful provisioning or the setup timeout returns
+the printer to STA-only operation.
+
+The printer stores STA credentials as one NVS record only after a successful
+connection. A failed setup attempt is not persisted. During normal operation,
+a transient STA disconnect relies on automatic reconnect and does **not** open
+the setup AP.
+
+Normal network services are:
 
 - HTTP on port `80`
 - MP protocol over raw TCP on port `9100`
 - mDNS as `mini-printer-xxxx.local`
 
-Connect to `Mini-Printer-XXXX` and open `http://192.168.4.1/` in a browser.
-The setup AP does not redirect other hostnames.
+During setup, connect to `Mini-Printer-XXXX`. Captive DNS redirects generic
+HTTP probes to the embedded page; `http://192.168.4.1/` is also available.
 
 The TCP service is not IPP, AirPrint, JetDirect, or ESC/POS. It carries the
 project's MP framing protocol.
@@ -127,5 +154,6 @@ The current pin map targets the original V4 board configuration. Print-head
 timing and thermistor calibration are intentionally kept in the hardware layer
 so they can be validated and tuned independently of protocol/network changes.
 
-The GPIO 5 button prints a built-in diagnostic page on a double click. Holding
-it for about one second feeds paper, and releasing it stops the feed.
+GPIO 5 uses the shared `kbutton.c` gesture state machine. A double click prints
+a built-in diagnostic page, a triple click enters Wi-Fi setup mode, and holding
+the button for about one second feeds paper until release.

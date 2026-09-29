@@ -11,9 +11,9 @@
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #define BLE_NAME "Mini-Printer"
 
-// Wi-Fi runs in AP+STA mode. The AP is always available as a setup and
-// recovery path while STA credentials are stored in NVS after a successful
-// connection.
+// Wi-Fi normally runs as STA only. The setup AP is enabled only when there
+// are no credentials, the saved network is unavailable at boot, or the user
+// explicitly enters setup mode.
 #define WIFI_ENABLED 1
 #define WIFI_AP_SSID "Mini-Printer"
 #define WIFI_AP_PASSWORD ""
@@ -21,6 +21,9 @@
 #define WIFI_PRINT_PORT 9100
 #define WIFI_CLIENT_IDLE_TIMEOUT_MS 30000
 #define WIFI_CONNECT_TIMEOUT_MS 15000
+#define WIFI_STARTUP_CONNECT_TIMEOUT_MS 30000
+#define WIFI_SETUP_TIMEOUT_MS 300000
+#define WIFI_SETUP_CLOSE_DELAY_MS 1500
 #define WIFI_PREFS_NAMESPACE "wifi"
 
 #define DEFAULT_PRINT_DENSITY 64
