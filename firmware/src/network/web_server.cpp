@@ -32,6 +32,7 @@ button,input,select{font:inherit;padding:9px;box-sizing:border-box}
 button{cursor:pointer}select,input[type=password]{width:100%}
 .row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
 small,#message{color:#555}.ok{color:#176b2c}.bad{color:#a11}
+#status{white-space:pre-line}
 canvas{width:100%;max-width:384px;background:white;border:1px solid #ddd;image-rendering:pixelated}
 code{word-break:break-all}
 </style>
@@ -87,14 +88,14 @@ async function refreshStatus(){
     const sta=s.wifi.connected
       ? s.wifi.ssid+" · "+s.wifi.ip+" · "+s.wifi.rssi+" dBm"
       : "not connected";
-    $("status").innerHTML=
-      "Battery: "+s.battery+"%<br>"+
-      "Temperature: "+temp+"<br>"+
-      "Paper: "+(s.paper?"ready":"missing")+"<br>"+
-      "Printer: "+s.printer+"<br>"+
-      "Setup AP: <code>"+s.wifi.ap_ssid+"</code><br>"+
-      "LAN: "+sta+"<br>"+
-      "mDNS: <code>http://"+s.wifi.hostname+".local/</code>";
+    $("status").textContent=
+      "Battery: "+s.battery+"%\n"+
+      "Temperature: "+temp+"\n"+
+      "Paper: "+(s.paper?"ready":"missing")+"\n"+
+      "Printer: "+s.printer+"\n"+
+      "Setup AP: "+s.wifi.ap_ssid+"\n"+
+      "LAN: "+sta+"\n"+
+      "mDNS: http://"+s.wifi.hostname+".local/";
   }catch(e){
     $("status").textContent="Status unavailable";
   }
@@ -252,6 +253,8 @@ setInterval(refreshStatus,5000);
 typedef struct {
     uint32_t session;
     bool job_open;
+    bool saw_begin;
+    bool saw_end;
 } http_print_context_t;
 
 const char *printer_state_name(printer_state_e state)
@@ -493,8 +496,10 @@ esp_err_t wifi_connect_handler(httpd_req_t *req)
 
 esp_err_t wifi_forget_handler(httpd_req_t *req)
 {
+    const esp_err_t result =
+        send_text(req, "200 OK", "application/json", "{\"ok\":true}");
     wifi_manager_forget();
-    return send_text(req, "200 OK", "application/json", "{\"ok\":true}");
+    return result;
 }
 
 bool http_print_command(
@@ -516,10 +521,19 @@ bool http_print_command(
         return false;
 
     if (command->type == PRINT_PROTOCOL_BEGIN)
+    {
         context->job_open = true;
-    else if (command->type == PRINT_PROTOCOL_END ||
-             command->type == PRINT_PROTOCOL_CANCEL)
+        context->saw_begin = true;
+    }
+    else if (command->type == PRINT_PROTOCOL_END)
+    {
         context->job_open = false;
+        context->saw_end = true;
+    }
+    else if (command->type == PRINT_PROTOCOL_CANCEL)
+    {
+        context->job_open = false;
+    }
 
     return true;
 }
@@ -535,6 +549,8 @@ esp_err_t print_handler(httpd_req_t *req)
 
     http_print_context_t context = {
         next_session(),
+        false,
+        false,
         false,
     };
 
@@ -570,7 +586,16 @@ esp_err_t print_handler(httpd_req_t *req)
             static_cast<size_t>(received));
     }
 
-    if (!accepted || remaining != 0 || context.job_open)
+    const bool complete_frame =
+        parser.header_pos == 0 &&
+        parser.payload_pos == 0;
+
+    if (!accepted ||
+        remaining != 0 ||
+        context.job_open ||
+        !context.saw_begin ||
+        !context.saw_end ||
+        !complete_frame)
     {
         if (context.job_open)
         {
