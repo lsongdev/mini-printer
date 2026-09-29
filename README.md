@@ -13,7 +13,7 @@ client source code.
 
 | Path | Contents |
 | --- | --- |
-| [`firmware/`](firmware/) | PlatformIO firmware: hardware drivers, print queue, protocol parser, BLE, TCP, Wi-Fi AP+STA, and embedded Web UI |
+| [`firmware/`](firmware/) | PlatformIO firmware: hardware drivers, print queue, protocol parser, BLE, TCP, STA Wi-Fi with temporary setup AP, and embedded Web UI |
 | [`python/`](python/) | BLE test-page client and protocol tests |
 | [`docs/`](docs/) | Hardware notes, architecture, and [print protocol](docs/protocol.md) |
 | [`android/`](android/) · [`ios/`](ios/) · [`wxapp/`](wxapp/) | Client source code for other platforms |
@@ -49,9 +49,12 @@ python3 -m unittest discover -s python -p 'test_*.py'
 Print data uses the project's compact `MP` frame protocol. The firmware accepts
 the same protocol over BLE, raw TCP port `9100`, and HTTP `POST /api/print`.
 
-Wi-Fi runs as AP+STA. Connect to `Mini-Printer-XXXX` and open
-`http://192.168.4.1/` for the offline setup and print page. The page can join another Wi-Fi network while keeping
-the setup AP available, and can rasterize an image in the browser for printing.
+Wi-Fi normally runs as STA only. On first boot, after a saved-network startup
+failure, or after a triple click on the printer button, the temporary
+`Mini-Printer-XXXX` setup AP becomes available. Open `http://192.168.4.1/`
+(or use the captive portal) to select a network. The AP closes after successful
+provisioning. The embedded page also rasterizes images in the browser for
+printing during normal STA operation.
 
 The TCP endpoint is not IPP or AirPrint. See [`docs/protocol.md`](docs/protocol.md)
 for frame fields and status codes, and [`firmware/README.md`](firmware/README.md)
