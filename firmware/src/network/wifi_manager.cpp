@@ -23,6 +23,8 @@ std::atomic<wifi_state_e> current_state{wifi_state_e::connecting};
 std::atomic<bool> setup_start_requested{false};
 std::atomic<bool> setup_stop_pending{false};
 std::atomic<uint32_t> setup_stop_at{0};
+std::atomic<bool> startup_fallback_pending{false};
+std::atomic<uint32_t> startup_fallback_at{0};
 
 bool initialized = false;
 bool mdns_started = false;
@@ -201,6 +203,8 @@ void stop_setup_now()
 
 bool start_setup_now()
 {
+    startup_fallback_pending.store(false);
+
     if (current_state.load() == wifi_state_e::setup)
         return true;
 
@@ -342,23 +346,14 @@ bool wifi_manager_init()
 
     begin_saved_network(network);
     current_state.store(wifi_state_e::connecting);
+    startup_fallback_at.store(millis() + WIFI_STARTUP_CONNECT_TIMEOUT_MS);
+    startup_fallback_pending.store(true);
 
-    if (wait_for_connection(WIFI_STARTUP_CONNECT_TIMEOUT_MS))
-    {
-        current_state.store(wifi_state_e::online);
-        start_mdns();
+    Serial.printf(
+        "Wi-Fi STA connecting; setup fallback in %u ms\n",
+        static_cast<unsigned>(WIFI_STARTUP_CONNECT_TIMEOUT_MS));
 
-        Serial.printf(
-            "Wi-Fi STA online: %s, IP=%s\n",
-            WiFi.SSID().c_str(),
-            WiFi.localIP().toString().c_str());
-
-        return true;
-    }
-
-    Serial.println("Saved Wi-Fi unavailable; entering setup mode");
-    WiFi.disconnect(false, true);
-    return start_setup_now();
+    return true;
 }
 
 void wifi_manager_process()
@@ -369,7 +364,42 @@ void wifi_manager_process()
     if (setup_start_requested.exchange(false))
         start_setup_now();
 
-    if (current_state.load() != wifi_state_e::setup)
+    const wifi_state_e state = current_state.load();
+
+    if (state == wifi_state_e::online)
+    {
+        startup_fallback_pending.store(false);
+        start_mdns();
+        return;
+    }
+
+    if (state == wifi_state_e::connecting)
+    {
+        if (WiFi.status() == WL_CONNECTED)
+        {
+            current_state.store(wifi_state_e::online);
+            startup_fallback_pending.store(false);
+            start_mdns();
+            return;
+        }
+
+        if (startup_fallback_pending.load())
+        {
+            const uint32_t deadline = startup_fallback_at.load();
+
+            if (static_cast<int32_t>(millis() - deadline) >= 0)
+            {
+                startup_fallback_pending.store(false);
+                Serial.println("Saved Wi-Fi unavailable; entering setup mode");
+                WiFi.disconnect(false, true);
+                start_setup_now();
+            }
+        }
+
+        return;
+    }
+
+    if (state != wifi_state_e::setup)
         return;
 
     if (dns_started)
