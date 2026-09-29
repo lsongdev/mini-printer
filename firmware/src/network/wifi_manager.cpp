@@ -203,10 +203,11 @@ void stop_setup_now()
 
 bool start_setup_now()
 {
-    startup_fallback_pending.store(false);
-
     if (current_state.load() == wifi_state_e::setup)
+    {
+        startup_fallback_pending.store(false);
         return true;
+    }
 
     if (!WiFi.mode(WIFI_AP_STA))
     {
@@ -234,6 +235,7 @@ bool start_setup_now()
         Serial.println("Failed to start captive DNS");
 
     current_state.store(wifi_state_e::setup);
+    startup_fallback_pending.store(false);
 
     /*
      * If credentials already exist, setup mode is a temporary recovery window.
