@@ -52,12 +52,6 @@ struct PrinterScreen: View {
                 Button("Disconnect", role: .destructive) { store.disconnect() }
                     .disabled(store.isPrinting)
             } else {
-                if store.isConnecting {
-                    HStack {
-                        ProgressView()
-                        Text("Connecting…")
-                    }
-                }
                 if store.devices.isEmpty {
                     ContentUnavailableView(
                         "No Printer Found",
@@ -76,8 +70,14 @@ struct PrinterScreen: View {
                         HStack {
                             Label(device.name, systemImage: "printer")
                             Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.secondary)
+                            if store.connectingPrinterID == device.id {
+                                ProgressView()
+                                Text("Connecting…")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Image(systemName: "chevron.right")
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                     .disabled(store.isConnecting)

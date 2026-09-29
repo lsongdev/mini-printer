@@ -7,6 +7,7 @@ final class PrinterStore {
     var devices: [DiscoveredPrinter] = []
     var isScanning = false
     var isConnecting = false
+    var connectingPrinterID: UUID?
     var bluetoothAvailable = false
     var connectedName: String?
     var status: PrinterStatus?
@@ -30,6 +31,7 @@ final class PrinterStore {
         transport.onReady = { [weak self] name in
             self?.connectedName = name
             self?.isConnecting = false
+            self?.connectingPrinterID = nil
             if name == nil { self?.status = nil }
         }
         transport.onStatus = { [weak self] status in
@@ -41,6 +43,7 @@ final class PrinterStore {
         }
         transport.onFailure = { [weak self] error in
             self?.isConnecting = false
+            self?.connectingPrinterID = nil
             self?.errorMessage = error.localizedDescription
         }
     }
@@ -52,9 +55,11 @@ final class PrinterStore {
     func connect(to device: DiscoveredPrinter) {
         do {
             isConnecting = true
+            connectingPrinterID = device.id
             try transport.connect(to: device.id)
         } catch {
             isConnecting = false
+            connectingPrinterID = nil
             errorMessage = error.localizedDescription
         }
     }
