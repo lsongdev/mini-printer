@@ -5,7 +5,6 @@
 #if WIFI_ENABLED
 
 #include "core/print_service.h"
-#include "network/wifi_manager.h"
 #include "protocol/print_protocol.h"
 #include "transport_common.h"
 
@@ -84,12 +83,6 @@ void tcp_task(void *)
             continue;
         }
 
-        if (wifi_manager_setup_active())
-        {
-            client.stop();
-            continue;
-        }
-
         client.setNoDelay(true);
 
         tcp_context_t context = {
@@ -107,9 +100,7 @@ void tcp_task(void *)
         uint8_t buffer[128];
         uint32_t last_activity = millis();
 
-        while (client.connected() &&
-               accepted &&
-               !wifi_manager_setup_active())
+        while (client.connected() && accepted)
         {
             const int available = client.available();
             if (available <= 0)
