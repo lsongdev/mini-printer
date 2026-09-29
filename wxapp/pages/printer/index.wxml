@@ -1,0 +1,52 @@
+<view class="screen">
+  <view class="section">
+    <text class="section-title">Printer</text>
+    <view class="card">
+      <block wx:if="{{connectedName}}">
+        <view class="detail"><text class="detail-label">Connected to</text><text class="detail-value">{{connectedName}}</text></view>
+        <block wx:if="{{status}}">
+          <view class="detail"><text class="detail-label">State</text><text class="detail-value">{{statusView.state}}</text></view>
+          <view class="detail"><text class="detail-label">Battery</text><text class="detail-value">{{statusView.battery}}</text></view>
+          <view class="detail"><text class="detail-label">Print head</text><text class="detail-value">{{statusView.temperature}}</text></view>
+          <view class="detail"><text class="detail-label">Paper</text><text class="detail-value">{{statusView.paper}}</text></view>
+          <view class="detail" wx:if="{{statusView.error}}"><text class="detail-label">Error</text><text class="detail-value">{{statusView.error}}</text></view>
+        </block>
+        <text class="hint" wx:else>Waiting for printer status…</text>
+        <button class="secondary-button" bindtap="disconnect" disabled="{{printing}}">Disconnect</button>
+      </block>
+      <block wx:else>
+        <text class="hint" wx:if="{{!devices.length}}">{{scanning ? 'Searching nearby…' : bluetoothAvailable ? 'Tap Scan to find your printer.' : 'Turn on Bluetooth to discover printers.'}}</text>
+        <button class="device-button" wx:for="{{devices}}" wx:key="deviceId" data-id="{{item.deviceId}}" bindtap="connect" disabled="{{connectingId}}">
+          <view class="device-content">
+            <text class="device-name">{{item.name}}</text>
+            <text class="device-detail">{{connectingId === item.deviceId ? 'Connecting…' : 'Signal ' + item.rssi + ' dBm'}}</text>
+          </view>
+          <text class="device-action">{{connectingId === item.deviceId ? '●' : 'Connect'}}</text>
+        </button>
+        <button class="secondary-button" bindtap="scan" disabled="{{connectingId}}">{{scanning ? 'Scan Again' : 'Scan for Printers'}}</button>
+      </block>
+    </view>
+  </view>
+
+  <view class="section">
+    <text class="section-title">Photo</text>
+    <view class="card">
+      <button class="secondary-button first-button" bindtap="choosePhoto" disabled="{{processingPhoto || printing}}">{{processingPhoto ? 'Preparing Photo…' : 'Choose Photo'}}</button>
+      <image wx:if="{{photoPath}}" class="photo-preview" src="{{photoPath}}" mode="aspectFit" aria-label="Selected photo preview" />
+      <text class="hint" wx:else>Select a photo to print it in black and white.</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <text class="section-title">Print</text>
+    <view class="card">
+      <view class="detail density"><text class="detail-label">Density</text><text class="detail-value">{{density}}%</text></view>
+      <slider min="1" max="100" step="1" value="{{density}}" bindchange="changeDensity" activeColor="#0a84ff" />
+      <button class="primary-button" bindtap="printPhoto" disabled="{{!canPrintPhoto}}">Print Photo</button>
+      <button class="secondary-button" bindtap="printTestPage" disabled="{{!canPrintTest}}">Print Test Page</button>
+      <view class="detail progress" wx:if="{{printing}}"><text class="detail-label">Submitted lines</text><text class="detail-value">{{submittedLines}} / {{totalLines}}</text></view>
+    </view>
+  </view>
+
+  <canvas id="raster-canvas" type="2d" class="offscreen-canvas"></canvas>
+</view>
