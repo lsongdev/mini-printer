@@ -93,10 +93,11 @@ While setup mode is active:
 
 - captive DNS points hostnames at the setup AP
 - `/api/wifi/scan`, `/api/wifi/connect`, and `/api/wifi/forget` are enabled
-- HTTP printing and raw TCP port `9100` printing are rejected
+- the embedded Web UI can still print through `POST /api/print`
+- raw MP printing on TCP port `9100` remains available
 
-This keeps provisioning separate from normal printing and prevents the setup AP
-from becoming a permanent print interface.
+The AP is still temporary; successful provisioning or the setup timeout returns
+the printer to STA-only operation.
 
 The printer stores STA credentials as one NVS record only after a successful
 connection. A failed setup attempt is not persisted. During normal operation,
