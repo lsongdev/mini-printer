@@ -1,0 +1,28 @@
+{
+  "pages":[
+    "pages/devices/devices",
+    "pages/tasks/tasks"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#007f7f",
+    "navigationBarTitleText": "OWL蓝牙打印机",
+    "navigationBarTextStyle":"black"
+  },
+  "tabBar": {
+    "list": [{
+      "pagePath": "pages/devices/devices",
+      "text": "设备管理",
+      "iconPath": "statics/imgs/devices.png",
+      "selectedIconPath": "statics/imgs/devices.png"
+    },
+    {
+      "pagePath": "pages/tasks/tasks",
+      "text": "打印任务",
+      "iconPath": "statics/imgs/tasks.png",
+      "selectedIconPath": "statics/imgs/tasks.png"
+    }]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,763 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1420B0202A89B63B0048621D /* MiniPrinterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1420B01F2A89B63B0048621D /* MiniPrinterApp.swift */; };
+		1420B0242A89B63D0048621D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420B0232A89B63D0048621D /* Assets.xcassets */; };
+		1420B0272A89B63D0048621D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420B0262A89B63D0048621D /* Preview Assets.xcassets */; };
+		1420B02E2A89BD940048621D /* BluetoothSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1420B02D2A89BD940048621D /* BluetoothSearchView.swift */; };
+		1420B0332A89D8320048621D /* BTSearchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1420B0322A89D8320048621D /* BTSearchManager.swift */; };
+		145F0C872A9748C40004CBBD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145F0C862A9748C40004CBBD /* ContentView.swift */; };
+		145F0C892A98AB510004CBBD /* LongPressModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145F0C882A98AB510004CBBD /* LongPressModifier.swift */; };
+		14C24C172A95FF95003C676F /* ImageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C24C162A95FF95003C676F /* ImageHelper.swift */; };
+		14F455842A8A11D8006255D2 /* BlueSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 14F455832A8A11D8006255D2 /* BlueSwift */; };
+		14F455C32A8B1CFF006255D2 /* ZLImageEditorUIConfiguration+Chaining.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455A42A8B1CFF006255D2 /* ZLImageEditorUIConfiguration+Chaining.swift */; };
+		14F455C42A8B1CFF006255D2 /* ZLImageEditorLanguageDefine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455A52A8B1CFF006255D2 /* ZLImageEditorLanguageDefine.swift */; };
+		14F455C52A8B1CFF006255D2 /* ZLInputTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455A62A8B1CFF006255D2 /* ZLInputTextViewController.swift */; };
+		14F455C62A8B1CFF006255D2 /* ZLBaseStickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455A72A8B1CFF006255D2 /* ZLBaseStickerView.swift */; };
+		14F455C72A8B1CFF006255D2 /* ZLClipImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455A82A8B1CFF006255D2 /* ZLClipImageViewController.swift */; };
+		14F455C82A8B1CFF006255D2 /* ZLImageStickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455A92A8B1CFF006255D2 /* ZLImageStickerView.swift */; };
+		14F455C92A8B1CFF006255D2 /* ZLAdjustSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455AA2A8B1CFF006255D2 /* ZLAdjustSlider.swift */; };
+		14F455CA2A8B1CFF006255D2 /* ZLEditImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455AB2A8B1CFF006255D2 /* ZLEditImageViewController.swift */; };
+		14F455CB2A8B1CFF006255D2 /* ZLClipImageDismissAnimatedTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455AC2A8B1CFF006255D2 /* ZLClipImageDismissAnimatedTransition.swift */; };
+		14F455CC2A8B1CFF006255D2 /* ZLFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455AD2A8B1CFF006255D2 /* ZLFilter.swift */; };
+		14F455CD2A8B1CFF006255D2 /* ZLImageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455AE2A8B1CFF006255D2 /* ZLImageEditor.swift */; };
+		14F455CE2A8B1CFF006255D2 /* ZLEnlargeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455AF2A8B1CFF006255D2 /* ZLEnlargeButton.swift */; };
+		14F455CF2A8B1CFF006255D2 /* ZLWeakProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455B02A8B1CFF006255D2 /* ZLWeakProxy.swift */; };
+		14F455D02A8B1CFF006255D2 /* ZLTextStickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455B12A8B1CFF006255D2 /* ZLTextStickerView.swift */; };
+		14F455D12A8B1CFF006255D2 /* ZLProgressHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455B22A8B1CFF006255D2 /* ZLProgressHUD.swift */; };
+		14F455D22A8B1CFF006255D2 /* ZLImageEditorConfiguration+Chaining.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455B32A8B1CFF006255D2 /* ZLImageEditorConfiguration+Chaining.swift */; };
+		14F455D32A8B1CFF006255D2 /* ZLImageEditorConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455B42A8B1CFF006255D2 /* ZLImageEditorConfiguration.swift */; };
+		14F455D42A8B1CFF006255D2 /* ZLEditToolCells.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455B52A8B1CFF006255D2 /* ZLEditToolCells.swift */; };
+		14F455D52A8B1CFF006255D2 /* ZLImageEditorUIConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455B62A8B1CFF006255D2 /* ZLImageEditorUIConfiguration.swift */; };
+		14F455D62A8B1CFF006255D2 /* ZLImageEditorDefine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455B72A8B1CFF006255D2 /* ZLImageEditorDefine.swift */; };
+		14F455D72A8B1CFF006255D2 /* CGFloat+ZLImageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455B92A8B1CFF006255D2 /* CGFloat+ZLImageEditor.swift */; };
+		14F455D82A8B1CFF006255D2 /* UIView+ZLImageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455BA2A8B1CFF006255D2 /* UIView+ZLImageEditor.swift */; };
+		14F455D92A8B1CFF006255D2 /* UIImage+ZLImageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455BB2A8B1CFF006255D2 /* UIImage+ZLImageEditor.swift */; };
+		14F455DA2A8B1CFF006255D2 /* Cell+ZLImageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455BC2A8B1CFF006255D2 /* Cell+ZLImageEditor.swift */; };
+		14F455DB2A8B1CFF006255D2 /* Bundle+ZLImageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455BD2A8B1CFF006255D2 /* Bundle+ZLImageEditor.swift */; };
+		14F455DC2A8B1CFF006255D2 /* UIColor+ZLImageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455BE2A8B1CFF006255D2 /* UIColor+ZLImageEditor.swift */; };
+		14F455DD2A8B1CFF006255D2 /* String+ZLImageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455BF2A8B1CFF006255D2 /* String+ZLImageEditor.swift */; };
+		14F455DE2A8B1CFF006255D2 /* ZLImageEditor.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 14F455C12A8B1CFF006255D2 /* ZLImageEditor.bundle */; };
+		14F455E12A8B6190006255D2 /* PrinterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455E02A8B6190006255D2 /* PrinterView.swift */; };
+		14F455E32A8B7596006255D2 /* PrinterInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455E22A8B7596006255D2 /* PrinterInfoView.swift */; };
+		14F455E52A8B7814006255D2 /* PrintToolBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455E42A8B7814006255D2 /* PrintToolBarView.swift */; };
+		14F455E72A8B7F0C006255D2 /* PrinterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455E62A8B7F0C006255D2 /* PrinterViewModel.swift */; };
+		14F455EA2A8B9B54006255D2 /* JGProgressHUD-SwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 14F455E92A8B9B54006255D2 /* JGProgressHUD-SwiftUI */; };
+		14F455EC2A8B9CF8006255D2 /* HomeContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455EB2A8B9CF8006255D2 /* HomeContainer.swift */; };
+		14F455F12A8C5474006255D2 /* AlertToast in Frameworks */ = {isa = PBXBuildFile; productRef = 14F455F02A8C5474006255D2 /* AlertToast */; };
+		14F455F32A8C796A006255D2 /* PrinterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455F22A8C7969006255D2 /* PrinterModel.swift */; };
+		14F455F62A8CAF44006255D2 /* PopupView in Frameworks */ = {isa = PBXBuildFile; productRef = 14F455F52A8CAF44006255D2 /* PopupView */; };
+		14F455F82A8CB7C1006255D2 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455F72A8CB7C1006255D2 /* ImagePicker.swift */; };
+		14F455FB2A8CBF8F006255D2 /* LBJImagePreviewer in Frameworks */ = {isa = PBXBuildFile; productRef = 14F455FA2A8CBF8F006255D2 /* LBJImagePreviewer */; };
+		14F455FD2A8CC6EB006255D2 /* ZoomableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455FC2A8CC6EB006255D2 /* ZoomableImageView.swift */; };
+		14F455FF2A8CC84F006255D2 /* ImageEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F455FE2A8CC84F006255D2 /* ImageEditor.swift */; };
+		14F456022A8CE819006255D2 /* ImageStickerContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F456002A8CE819006255D2 /* ImageStickerContainerView.swift */; };
+		14F456032A8CE819006255D2 /* FontChooserContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F456012A8CE819006255D2 /* FontChooserContainerView.swift */; };
+		14F456062A8CE915006255D2 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 14F456052A8CE915006255D2 /* SnapKit */; };
+		14F456082A8DAA75006255D2 /* WhiteImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14F456072A8DAA75006255D2 /* WhiteImage.swift */; };
+		8C7F36742A9A3B3000A26BC9 /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C7F36732A9A3B3000A26BC9 /* Toast.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1420B01C2A89B63B0048621D /* MiniPrinter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MiniPrinter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1420B01F2A89B63B0048621D /* MiniPrinterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPrinterApp.swift; sourceTree = "<group>"; };
+		1420B0232A89B63D0048621D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1420B0262A89B63D0048621D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		1420B02D2A89BD940048621D /* BluetoothSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothSearchView.swift; sourceTree = "<group>"; };
+		1420B0322A89D8320048621D /* BTSearchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BTSearchManager.swift; sourceTree = "<group>"; };
+		145F0C862A9748C40004CBBD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		145F0C882A98AB510004CBBD /* LongPressModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LongPressModifier.swift; sourceTree = "<group>"; };
+		14C24C162A95FF95003C676F /* ImageHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageHelper.swift; sourceTree = "<group>"; };
+		14F455A42A8B1CFF006255D2 /* ZLImageEditorUIConfiguration+Chaining.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ZLImageEditorUIConfiguration+Chaining.swift"; sourceTree = "<group>"; };
+		14F455A52A8B1CFF006255D2 /* ZLImageEditorLanguageDefine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLImageEditorLanguageDefine.swift; sourceTree = "<group>"; };
+		14F455A62A8B1CFF006255D2 /* ZLInputTextViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLInputTextViewController.swift; sourceTree = "<group>"; };
+		14F455A72A8B1CFF006255D2 /* ZLBaseStickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLBaseStickerView.swift; sourceTree = "<group>"; };
+		14F455A82A8B1CFF006255D2 /* ZLClipImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLClipImageViewController.swift; sourceTree = "<group>"; };
+		14F455A92A8B1CFF006255D2 /* ZLImageStickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLImageStickerView.swift; sourceTree = "<group>"; };
+		14F455AA2A8B1CFF006255D2 /* ZLAdjustSlider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLAdjustSlider.swift; sourceTree = "<group>"; };
+		14F455AB2A8B1CFF006255D2 /* ZLEditImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLEditImageViewController.swift; sourceTree = "<group>"; };
+		14F455AC2A8B1CFF006255D2 /* ZLClipImageDismissAnimatedTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLClipImageDismissAnimatedTransition.swift; sourceTree = "<group>"; };
+		14F455AD2A8B1CFF006255D2 /* ZLFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLFilter.swift; sourceTree = "<group>"; };
+		14F455AE2A8B1CFF006255D2 /* ZLImageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLImageEditor.swift; sourceTree = "<group>"; };
+		14F455AF2A8B1CFF006255D2 /* ZLEnlargeButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLEnlargeButton.swift; sourceTree = "<group>"; };
+		14F455B02A8B1CFF006255D2 /* ZLWeakProxy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLWeakProxy.swift; sourceTree = "<group>"; };
+		14F455B12A8B1CFF006255D2 /* ZLTextStickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLTextStickerView.swift; sourceTree = "<group>"; };
+		14F455B22A8B1CFF006255D2 /* ZLProgressHUD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLProgressHUD.swift; sourceTree = "<group>"; };
+		14F455B32A8B1CFF006255D2 /* ZLImageEditorConfiguration+Chaining.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ZLImageEditorConfiguration+Chaining.swift"; sourceTree = "<group>"; };
+		14F455B42A8B1CFF006255D2 /* ZLImageEditorConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLImageEditorConfiguration.swift; sourceTree = "<group>"; };
+		14F455B52A8B1CFF006255D2 /* ZLEditToolCells.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLEditToolCells.swift; sourceTree = "<group>"; };
+		14F455B62A8B1CFF006255D2 /* ZLImageEditorUIConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLImageEditorUIConfiguration.swift; sourceTree = "<group>"; };
+		14F455B72A8B1CFF006255D2 /* ZLImageEditorDefine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZLImageEditorDefine.swift; sourceTree = "<group>"; };
+		14F455B92A8B1CFF006255D2 /* CGFloat+ZLImageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGFloat+ZLImageEditor.swift"; sourceTree = "<group>"; };
+		14F455BA2A8B1CFF006255D2 /* UIView+ZLImageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+ZLImageEditor.swift"; sourceTree = "<group>"; };
+		14F455BB2A8B1CFF006255D2 /* UIImage+ZLImageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+ZLImageEditor.swift"; sourceTree = "<group>"; };
+		14F455BC2A8B1CFF006255D2 /* Cell+ZLImageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Cell+ZLImageEditor.swift"; sourceTree = "<group>"; };
+		14F455BD2A8B1CFF006255D2 /* Bundle+ZLImageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Bundle+ZLImageEditor.swift"; sourceTree = "<group>"; };
+		14F455BE2A8B1CFF006255D2 /* UIColor+ZLImageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+ZLImageEditor.swift"; sourceTree = "<group>"; };
+		14F455BF2A8B1CFF006255D2 /* String+ZLImageEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+ZLImageEditor.swift"; sourceTree = "<group>"; };
+		14F455C02A8B1CFF006255D2 /* ZLImageEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZLImageEditor.h; sourceTree = "<group>"; };
+		14F455C12A8B1CFF006255D2 /* ZLImageEditor.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = ZLImageEditor.bundle; sourceTree = "<group>"; };
+		14F455E02A8B6190006255D2 /* PrinterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterView.swift; sourceTree = "<group>"; };
+		14F455E22A8B7596006255D2 /* PrinterInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterInfoView.swift; sourceTree = "<group>"; };
+		14F455E42A8B7814006255D2 /* PrintToolBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintToolBarView.swift; sourceTree = "<group>"; };
+		14F455E62A8B7F0C006255D2 /* PrinterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterViewModel.swift; sourceTree = "<group>"; };
+		14F455EB2A8B9CF8006255D2 /* HomeContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeContainer.swift; sourceTree = "<group>"; };
+		14F455F22A8C7969006255D2 /* PrinterModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterModel.swift; sourceTree = "<group>"; };
+		14F455F72A8CB7C1006255D2 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		14F455FC2A8CC6EB006255D2 /* ZoomableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageView.swift; sourceTree = "<group>"; };
+		14F455FE2A8CC84F006255D2 /* ImageEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditor.swift; sourceTree = "<group>"; };
+		14F456002A8CE819006255D2 /* ImageStickerContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageStickerContainerView.swift; sourceTree = "<group>"; };
+		14F456012A8CE819006255D2 /* FontChooserContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FontChooserContainerView.swift; sourceTree = "<group>"; };
+		14F456072A8DAA75006255D2 /* WhiteImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhiteImage.swift; sourceTree = "<group>"; };
+		14F456092A8DACA3006255D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8C7F36732A9A3B3000A26BC9 /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1420B0192A89B63B0048621D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				14F455F62A8CAF44006255D2 /* PopupView in Frameworks */,
+				14F455FB2A8CBF8F006255D2 /* LBJImagePreviewer in Frameworks */,
+				14F455F12A8C5474006255D2 /* AlertToast in Frameworks */,
+				14F456062A8CE915006255D2 /* SnapKit in Frameworks */,
+				14F455EA2A8B9B54006255D2 /* JGProgressHUD-SwiftUI in Frameworks */,
+				14F455842A8A11D8006255D2 /* BlueSwift in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1420B0132A89B63B0048621D = {
+			isa = PBXGroup;
+			children = (
+				1420B01E2A89B63B0048621D /* MiniPrinter */,
+				1420B01D2A89B63B0048621D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1420B01D2A89B63B0048621D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1420B01C2A89B63B0048621D /* MiniPrinter.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1420B01E2A89B63B0048621D /* MiniPrinter */ = {
+			isa = PBXGroup;
+			children = (
+				14777F3D2AAADBF500180EED /* App */,
+				14777F3C2AAADB5800180EED /* Tools */,
+				14777F3B2AAADB4400180EED /* Toast */,
+				14777F362AAADA8600180EED /* Printer */,
+				14777F352AAADA7B00180EED /* Home */,
+				14777F342AAADA3A00180EED /* Bluetooth */,
+				14F455A22A8B1CFF006255D2 /* ImageEdit */,
+				1420B0252A89B63D0048621D /* Preview Content */,
+				14777F3E2AAADC0600180EED /* Test */,
+			);
+			path = MiniPrinter;
+			sourceTree = "<group>";
+		};
+		1420B0252A89B63D0048621D /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				1420B0262A89B63D0048621D /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		14777F342AAADA3A00180EED /* Bluetooth */ = {
+			isa = PBXGroup;
+			children = (
+				1420B0322A89D8320048621D /* BTSearchManager.swift */,
+				1420B02D2A89BD940048621D /* BluetoothSearchView.swift */,
+			);
+			path = Bluetooth;
+			sourceTree = "<group>";
+		};
+		14777F352AAADA7B00180EED /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				14F455EB2A8B9CF8006255D2 /* HomeContainer.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		14777F362AAADA8600180EED /* Printer */ = {
+			isa = PBXGroup;
+			children = (
+				14777F3A2AAADB1B00180EED /* Model */,
+				14777F382AAADAA600180EED /* ViewModel */,
+				14777F372AAADA9A00180EED /* View */,
+			);
+			path = Printer;
+			sourceTree = "<group>";
+		};
+		14777F372AAADA9A00180EED /* View */ = {
+			isa = PBXGroup;
+			children = (
+				14F455E02A8B6190006255D2 /* PrinterView.swift */,
+				14F455E22A8B7596006255D2 /* PrinterInfoView.swift */,
+				14F455E42A8B7814006255D2 /* PrintToolBarView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		14777F382AAADAA600180EED /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				14F455E62A8B7F0C006255D2 /* PrinterViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		14777F392AAADAC700180EED /* ImageTools */ = {
+			isa = PBXGroup;
+			children = (
+				14F455FE2A8CC84F006255D2 /* ImageEditor.swift */,
+				14F455F72A8CB7C1006255D2 /* ImagePicker.swift */,
+				14F456072A8DAA75006255D2 /* WhiteImage.swift */,
+				14C24C162A95FF95003C676F /* ImageHelper.swift */,
+				14F455FC2A8CC6EB006255D2 /* ZoomableImageView.swift */,
+			);
+			path = ImageTools;
+			sourceTree = "<group>";
+		};
+		14777F3A2AAADB1B00180EED /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				14F455F22A8C7969006255D2 /* PrinterModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		14777F3B2AAADB4400180EED /* Toast */ = {
+			isa = PBXGroup;
+			children = (
+				8C7F36732A9A3B3000A26BC9 /* Toast.swift */,
+			);
+			path = Toast;
+			sourceTree = "<group>";
+		};
+		14777F3C2AAADB5800180EED /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				14777F392AAADAC700180EED /* ImageTools */,
+				145F0C882A98AB510004CBBD /* LongPressModifier.swift */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		14777F3D2AAADBF500180EED /* App */ = {
+			isa = PBXGroup;
+			children = (
+				1420B01F2A89B63B0048621D /* MiniPrinterApp.swift */,
+				14F456092A8DACA3006255D2 /* Info.plist */,
+				1420B0232A89B63D0048621D /* Assets.xcassets */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		14777F3E2AAADC0600180EED /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				145F0C862A9748C40004CBBD /* ContentView.swift */,
+			);
+			path = Test;
+			sourceTree = "<group>";
+		};
+		14F455A22A8B1CFF006255D2 /* ImageEdit */ = {
+			isa = PBXGroup;
+			children = (
+				14F456012A8CE819006255D2 /* FontChooserContainerView.swift */,
+				14F456002A8CE819006255D2 /* ImageStickerContainerView.swift */,
+				14F455A32A8B1CFF006255D2 /* General */,
+				14F455B82A8B1CFF006255D2 /* Extensions */,
+				14F455C02A8B1CFF006255D2 /* ZLImageEditor.h */,
+				14F455C12A8B1CFF006255D2 /* ZLImageEditor.bundle */,
+			);
+			path = ImageEdit;
+			sourceTree = "<group>";
+		};
+		14F455A32A8B1CFF006255D2 /* General */ = {
+			isa = PBXGroup;
+			children = (
+				14F455A42A8B1CFF006255D2 /* ZLImageEditorUIConfiguration+Chaining.swift */,
+				14F455A52A8B1CFF006255D2 /* ZLImageEditorLanguageDefine.swift */,
+				14F455A62A8B1CFF006255D2 /* ZLInputTextViewController.swift */,
+				14F455A72A8B1CFF006255D2 /* ZLBaseStickerView.swift */,
+				14F455A82A8B1CFF006255D2 /* ZLClipImageViewController.swift */,
+				14F455A92A8B1CFF006255D2 /* ZLImageStickerView.swift */,
+				14F455AA2A8B1CFF006255D2 /* ZLAdjustSlider.swift */,
+				14F455AB2A8B1CFF006255D2 /* ZLEditImageViewController.swift */,
+				14F455AC2A8B1CFF006255D2 /* ZLClipImageDismissAnimatedTransition.swift */,
+				14F455AD2A8B1CFF006255D2 /* ZLFilter.swift */,
+				14F455AE2A8B1CFF006255D2 /* ZLImageEditor.swift */,
+				14F455AF2A8B1CFF006255D2 /* ZLEnlargeButton.swift */,
+				14F455B02A8B1CFF006255D2 /* ZLWeakProxy.swift */,
+				14F455B12A8B1CFF006255D2 /* ZLTextStickerView.swift */,
+				14F455B22A8B1CFF006255D2 /* ZLProgressHUD.swift */,
+				14F455B32A8B1CFF006255D2 /* ZLImageEditorConfiguration+Chaining.swift */,
+				14F455B42A8B1CFF006255D2 /* ZLImageEditorConfiguration.swift */,
+				14F455B52A8B1CFF006255D2 /* ZLEditToolCells.swift */,
+				14F455B62A8B1CFF006255D2 /* ZLImageEditorUIConfiguration.swift */,
+				14F455B72A8B1CFF006255D2 /* ZLImageEditorDefine.swift */,
+			);
+			path = General;
+			sourceTree = "<group>";
+		};
+		14F455B82A8B1CFF006255D2 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				14F455B92A8B1CFF006255D2 /* CGFloat+ZLImageEditor.swift */,
+				14F455BA2A8B1CFF006255D2 /* UIView+ZLImageEditor.swift */,
+				14F455BB2A8B1CFF006255D2 /* UIImage+ZLImageEditor.swift */,
+				14F455BC2A8B1CFF006255D2 /* Cell+ZLImageEditor.swift */,
+				14F455BD2A8B1CFF006255D2 /* Bundle+ZLImageEditor.swift */,
+				14F455BE2A8B1CFF006255D2 /* UIColor+ZLImageEditor.swift */,
+				14F455BF2A8B1CFF006255D2 /* String+ZLImageEditor.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1420B01B2A89B63B0048621D /* MiniPrinter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1420B02A2A89B63D0048621D /* Build configuration list for PBXNativeTarget "MiniPrinter" */;
+			buildPhases = (
+				1420B0182A89B63B0048621D /* Sources */,
+				1420B0192A89B63B0048621D /* Frameworks */,
+				1420B01A2A89B63B0048621D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MiniPrinter;
+			packageProductDependencies = (
+				14F455832A8A11D8006255D2 /* BlueSwift */,
+				14F455E92A8B9B54006255D2 /* JGProgressHUD-SwiftUI */,
+				14F455F02A8C5474006255D2 /* AlertToast */,
+				14F455F52A8CAF44006255D2 /* PopupView */,
+				14F455FA2A8CBF8F006255D2 /* LBJImagePreviewer */,
+				14F456052A8CE915006255D2 /* SnapKit */,
+			);
+			productName = MiniPrinter;
+			productReference = 1420B01C2A89B63B0048621D /* MiniPrinter.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1420B0142A89B63B0048621D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1420;
+				LastUpgradeCheck = 1420;
+				TargetAttributes = {
+					1420B01B2A89B63B0048621D = {
+						CreatedOnToolsVersion = 14.2;
+					};
+				};
+			};
+			buildConfigurationList = 1420B0172A89B63B0048621D /* Build configuration list for PBXProject "MiniPrinter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = 1420B0132A89B63B0048621D;
+			packageReferences = (
+				14F455822A8A11D8006255D2 /* XCRemoteSwiftPackageReference "BlueSwift" */,
+				14F455E82A8B9B54006255D2 /* XCRemoteSwiftPackageReference "JGProgressHUD-SwiftUI" */,
+				14F455EF2A8C5474006255D2 /* XCRemoteSwiftPackageReference "AlertToast" */,
+				14F455F42A8CAF44006255D2 /* XCRemoteSwiftPackageReference "PopupView" */,
+				14F455F92A8CBF8F006255D2 /* XCRemoteSwiftPackageReference "LBJImagePreviewer" */,
+				14F456042A8CE915006255D2 /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
+			productRefGroup = 1420B01D2A89B63B0048621D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1420B01B2A89B63B0048621D /* MiniPrinter */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1420B01A2A89B63B0048621D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1420B0272A89B63D0048621D /* Preview Assets.xcassets in Resources */,
+				14F455DE2A8B1CFF006255D2 /* ZLImageEditor.bundle in Resources */,
+				1420B0242A89B63D0048621D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1420B0182A89B63B0048621D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				14F455CE2A8B1CFF006255D2 /* ZLEnlargeButton.swift in Sources */,
+				1420B0202A89B63B0048621D /* MiniPrinterApp.swift in Sources */,
+				14F455CB2A8B1CFF006255D2 /* ZLClipImageDismissAnimatedTransition.swift in Sources */,
+				14F455CF2A8B1CFF006255D2 /* ZLWeakProxy.swift in Sources */,
+				14F455C52A8B1CFF006255D2 /* ZLInputTextViewController.swift in Sources */,
+				14F455FD2A8CC6EB006255D2 /* ZoomableImageView.swift in Sources */,
+				14F455D82A8B1CFF006255D2 /* UIView+ZLImageEditor.swift in Sources */,
+				14F455D02A8B1CFF006255D2 /* ZLTextStickerView.swift in Sources */,
+				8C7F36742A9A3B3000A26BC9 /* Toast.swift in Sources */,
+				14F455F82A8CB7C1006255D2 /* ImagePicker.swift in Sources */,
+				145F0C872A9748C40004CBBD /* ContentView.swift in Sources */,
+				14F455C82A8B1CFF006255D2 /* ZLImageStickerView.swift in Sources */,
+				14F455E52A8B7814006255D2 /* PrintToolBarView.swift in Sources */,
+				14F456082A8DAA75006255D2 /* WhiteImage.swift in Sources */,
+				14F455EC2A8B9CF8006255D2 /* HomeContainer.swift in Sources */,
+				14F455C42A8B1CFF006255D2 /* ZLImageEditorLanguageDefine.swift in Sources */,
+				14F455CC2A8B1CFF006255D2 /* ZLFilter.swift in Sources */,
+				14F455FF2A8CC84F006255D2 /* ImageEditor.swift in Sources */,
+				14F455D32A8B1CFF006255D2 /* ZLImageEditorConfiguration.swift in Sources */,
+				14F455E12A8B6190006255D2 /* PrinterView.swift in Sources */,
+				14F455CA2A8B1CFF006255D2 /* ZLEditImageViewController.swift in Sources */,
+				14F455E32A8B7596006255D2 /* PrinterInfoView.swift in Sources */,
+				14F455D52A8B1CFF006255D2 /* ZLImageEditorUIConfiguration.swift in Sources */,
+				14F455D92A8B1CFF006255D2 /* UIImage+ZLImageEditor.swift in Sources */,
+				14F455C72A8B1CFF006255D2 /* ZLClipImageViewController.swift in Sources */,
+				14F455C62A8B1CFF006255D2 /* ZLBaseStickerView.swift in Sources */,
+				14F455D22A8B1CFF006255D2 /* ZLImageEditorConfiguration+Chaining.swift in Sources */,
+				14F455D62A8B1CFF006255D2 /* ZLImageEditorDefine.swift in Sources */,
+				14F455E72A8B7F0C006255D2 /* PrinterViewModel.swift in Sources */,
+				14F456022A8CE819006255D2 /* ImageStickerContainerView.swift in Sources */,
+				14F455C32A8B1CFF006255D2 /* ZLImageEditorUIConfiguration+Chaining.swift in Sources */,
+				14F455D12A8B1CFF006255D2 /* ZLProgressHUD.swift in Sources */,
+				14F456032A8CE819006255D2 /* FontChooserContainerView.swift in Sources */,
+				1420B02E2A89BD940048621D /* BluetoothSearchView.swift in Sources */,
+				14F455D72A8B1CFF006255D2 /* CGFloat+ZLImageEditor.swift in Sources */,
+				14F455DA2A8B1CFF006255D2 /* Cell+ZLImageEditor.swift in Sources */,
+				14F455D42A8B1CFF006255D2 /* ZLEditToolCells.swift in Sources */,
+				14F455DD2A8B1CFF006255D2 /* String+ZLImageEditor.swift in Sources */,
+				14F455F32A8C796A006255D2 /* PrinterModel.swift in Sources */,
+				14F455DB2A8B1CFF006255D2 /* Bundle+ZLImageEditor.swift in Sources */,
+				14F455DC2A8B1CFF006255D2 /* UIColor+ZLImageEditor.swift in Sources */,
+				14F455C92A8B1CFF006255D2 /* ZLAdjustSlider.swift in Sources */,
+				1420B0332A89D8320048621D /* BTSearchManager.swift in Sources */,
+				14F455CD2A8B1CFF006255D2 /* ZLImageEditor.swift in Sources */,
+				145F0C892A98AB510004CBBD /* LongPressModifier.swift in Sources */,
+				14C24C172A95FF95003C676F /* ImageHelper.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1420B0282A89B63D0048621D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1420B0292A89B63D0048621D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1420B02B2A89B63D0048621D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"MiniPrinter/Preview Content\"";
+				DEVELOPMENT_TEAM = W6DU6USJVV;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MiniPrinter/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "迷你打印机";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "搜索和连接MINI打印机蓝牙";
+				INFOPLIST_KEY_NSCameraUsageDescription = "拍摄照片用于打印";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lexiangqicheng.printer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1420B02C2A89B63D0048621D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"MiniPrinter/Preview Content\"";
+				DEVELOPMENT_TEAM = W6DU6USJVV;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MiniPrinter/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "迷你打印机";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "搜索和连接MINI打印机蓝牙";
+				INFOPLIST_KEY_NSCameraUsageDescription = "拍摄照片用于打印";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lexiangqicheng.printer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1420B0172A89B63B0048621D /* Build configuration list for PBXProject "MiniPrinter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1420B0282A89B63D0048621D /* Debug */,
+				1420B0292A89B63D0048621D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1420B02A2A89B63D0048621D /* Build configuration list for PBXNativeTarget "MiniPrinter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1420B02B2A89B63D0048621D /* Debug */,
+				1420B02C2A89B63D0048621D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		14F455822A8A11D8006255D2 /* XCRemoteSwiftPackageReference "BlueSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/netguru/BlueSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		14F455E82A8B9B54006255D2 /* XCRemoteSwiftPackageReference "JGProgressHUD-SwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JonasGessner/JGProgressHUD-SwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.1;
+			};
+		};
+		14F455EF2A8C5474006255D2 /* XCRemoteSwiftPackageReference "AlertToast" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/elai950/AlertToast.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		14F455F42A8CAF44006255D2 /* XCRemoteSwiftPackageReference "PopupView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/PopupView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+		14F455F92A8CBF8F006255D2 /* XCRemoteSwiftPackageReference "LBJImagePreviewer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Lebron1992/LBJImagePreviewer";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+		14F456042A8CE915006255D2 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		14F455832A8A11D8006255D2 /* BlueSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 14F455822A8A11D8006255D2 /* XCRemoteSwiftPackageReference "BlueSwift" */;
+			productName = BlueSwift;
+		};
+		14F455E92A8B9B54006255D2 /* JGProgressHUD-SwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 14F455E82A8B9B54006255D2 /* XCRemoteSwiftPackageReference "JGProgressHUD-SwiftUI" */;
+			productName = "JGProgressHUD-SwiftUI";
+		};
+		14F455F02A8C5474006255D2 /* AlertToast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 14F455EF2A8C5474006255D2 /* XCRemoteSwiftPackageReference "AlertToast" */;
+			productName = AlertToast;
+		};
+		14F455F52A8CAF44006255D2 /* PopupView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 14F455F42A8CAF44006255D2 /* XCRemoteSwiftPackageReference "PopupView" */;
+			productName = PopupView;
+		};
+		14F455FA2A8CBF8F006255D2 /* LBJImagePreviewer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 14F455F92A8CBF8F006255D2 /* XCRemoteSwiftPackageReference "LBJImagePreviewer" */;
+			productName = LBJImagePreviewer;
+		};
+		14F456052A8CE915006255D2 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 14F456042A8CE915006255D2 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 1420B0142A89B63B0048621D /* Project object */;
+}
