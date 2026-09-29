@@ -97,7 +97,16 @@ bool wifi_manager_init()
     make_names();
 
     WiFi.mode(WIFI_AP_STA);
-    WiFi.setSleep(false);
+
+    // ESP32 Wi-Fi and Bluetooth share the 2.4 GHz radio. The coexistence
+    // controller requires Wi-Fi modem sleep; WIFI_PS_NONE causes an abort
+    // as soon as both stacks are enabled.
+    if (!WiFi.setSleep(true))
+    {
+        Serial.println("Failed to enable Wi-Fi modem sleep");
+        return false;
+    }
+
     WiFi.setAutoReconnect(true);
     WiFi.setHostname(hostname);
 
