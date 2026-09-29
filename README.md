@@ -53,8 +53,8 @@ Wi-Fi normally runs as STA only. On first boot, after a saved-network startup
 failure, or after a triple click on the printer button, the temporary
 `Mini-Printer-XXXX` setup AP becomes available. Open `http://192.168.4.1/`
 (or use the captive portal) to select a network. The AP closes after successful
-provisioning. The embedded page also rasterizes images in the browser for
-printing during normal STA operation.
+provisioning. The embedded page can rasterize images in the browser and print
+through either the temporary setup AP or normal STA operation.
 
 The TCP endpoint is not IPP or AirPrint. See [`docs/protocol.md`](docs/protocol.md)
 for frame fields and status codes, and [`firmware/README.md`](firmware/README.md)
