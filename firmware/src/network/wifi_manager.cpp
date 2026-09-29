@@ -452,6 +452,9 @@ wifi_connect_result_e wifi_manager_connect(
     saved_network_t previous = {};
     const bool had_previous = read_saved_network(&previous);
 
+    // Do not let the setup-window timeout race an active connection attempt.
+    setup_stop_pending.store(false);
+
     WiFi.disconnect(false, true);
     vTaskDelay(pdMS_TO_TICKS(50));
     WiFi.begin(ssid, password == nullptr ? "" : password);
@@ -461,7 +464,10 @@ wifi_connect_result_e wifi_manager_connect(
         WiFi.disconnect(false, true);
 
         if (had_previous)
+        {
             begin_saved_network(previous);
+            wifi_manager_schedule_setup_stop(WIFI_SETUP_TIMEOUT_MS);
+        }
 
         return wifi_connect_result_e::connection_failed;
     }
@@ -472,7 +478,10 @@ wifi_connect_result_e wifi_manager_connect(
 
         WiFi.disconnect(false, true);
         if (had_previous)
+        {
             begin_saved_network(previous);
+            wifi_manager_schedule_setup_stop(WIFI_SETUP_TIMEOUT_MS);
+        }
 
         return wifi_connect_result_e::save_failed;
     }
