@@ -163,6 +163,11 @@ bool wifi_manager_connect(
     if (!initialized || ssid == nullptr || ssid[0] == '\0')
         return false;
 
+    // Force a real transition even if STA is already connected; otherwise
+    // WL_CONNECTED can briefly describe the previous network and make a new
+    // credential set look successful.
+    WiFi.disconnect(false, true);
+    vTaskDelay(pdMS_TO_TICKS(50));
     WiFi.begin(ssid, password == nullptr ? "" : password);
 
     const uint32_t started = millis();
