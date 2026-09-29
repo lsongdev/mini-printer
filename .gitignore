@@ -1,0 +1,18 @@
+# Local OS and editor files
+.DS_Store
+*.swp
+*.swo
+
+# Build outputs and dependencies
+.pio/
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local configuration and logs
+.env
+.env.*
+!.env.example
+*.log

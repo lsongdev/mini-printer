@@ -10,8 +10,9 @@ from __future__ import annotations
 import argparse
 import asyncio
 import struct
+import time
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Awaitable, Callable, Iterable
 
 SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8"
@@ -27,6 +28,7 @@ STATUS = 0x80
 WIDTH = 384
 LINE_BYTES = WIDTH // 8
 PAGE_LINES = 96
+LINES_PER_BATCH = 8
 
 GLYPHS = {
     "B": (30, 17, 17, 30, 17, 17, 30),
@@ -57,8 +59,9 @@ class PrinterStatus:
 
 
 def frame(command: int, payload: bytes = b"") -> bytes:
-    if len(payload) > LINE_BYTES:
-        raise ValueError("Protocol payload exceeds 48 bytes")
+    expected = {BEGIN: 1, LINE: LINE_BYTES, END: 0, CANCEL: 0, STATUS_REQUEST: 0}
+    if command not in expected or len(payload) != expected[command]:
+        raise ValueError(f"Invalid command or payload length: {command:#x}, {len(payload)}")
     return struct.pack("<2sBBH", b"MP", VERSION, command, len(payload)) + payload
 
 
@@ -122,6 +125,39 @@ def page() -> Iterable[bytes]:
         yield render_line(y)
 
 
+def line_batches() -> Iterable[tuple[int, bytes]]:
+    """Bound each BLE write to eight complete line frames (432 bytes)."""
+    for start in range(0, PAGE_LINES, LINES_PER_BATCH):
+        end = min(start + LINES_PER_BATCH, PAGE_LINES)
+        yield end, b"".join(frame(LINE, render_line(y)) for y in range(start, end))
+
+
+def write_chunks(data: bytes, chunk_size: int) -> Iterable[bytes]:
+    for offset in range(0, len(data), chunk_size):
+        yield data[offset : offset + chunk_size]
+
+
+async def wait_for_completion(
+    events: asyncio.Queue[PrinterStatus],
+    request_status: Callable[[], Awaitable[None]],
+) -> None:
+    observed_printing = False
+    while True:
+        try:
+            status = await asyncio.wait_for(events.get(), timeout=3.0)
+        except TimeoutError:
+            await request_status()
+            continue
+        if status.state == 3 or status.error != 0:
+            raise RuntimeError(f"Printer reported failure: {status}")
+        if status.state == 1:
+            observed_printing = True
+        if observed_printing and status.state == 0:
+            return
+        if status.state != 1:
+            await request_status()
+
+
 async def find_printer(timeout: float, identifier: str | None):
     from bleak import BleakScanner
 
@@ -171,14 +207,22 @@ async def print_over_ble(args: argparse.Namespace) -> None:
         if "write" not in characteristic.properties or "notify" not in characteristic.properties:
             raise RuntimeError(f"Unexpected characteristic properties: {characteristic.properties}")
 
-        async def send(command: int, payload: bytes = b"") -> None:
-            encoded = frame(command, payload)
-            for offset in range(0, len(encoded), args.chunk_size):
+        max_chunk = min(512, client.mtu_size - 3)
+        chunk_size = args.chunk_size or max_chunk
+        if not 1 <= chunk_size <= max_chunk:
+            raise RuntimeError(f"Chunk size must be 1..{max_chunk} for MTU {client.mtu_size}")
+        print(f"BLE MTU={client.mtu_size}, write chunk={chunk_size} bytes")
+
+        async def write(data: bytes) -> None:
+            for chunk in write_chunks(data, chunk_size):
                 await client.write_gatt_char(
                     characteristic,
-                    encoded[offset : offset + args.chunk_size],
+                    chunk,
                     response=True,
                 )
+
+        async def send(command: int, payload: bytes = b"") -> None:
+            await write(frame(command, payload))
 
         await client.start_notify(characteristic, on_status)
         initial = decode_status(await client.read_gatt_char(characteristic))
@@ -191,38 +235,42 @@ async def print_over_ble(args: argparse.Namespace) -> None:
         while not status_events.empty():
             status_events.get_nowait()
 
-        job_open = False
+        job_active = False
         try:
+            started_at = time.monotonic()
             await send(BEGIN, bytes((args.density,)))
-            job_open = True
-            for number, raster in enumerate(page(), 1):
-                await send(LINE, raster)
+            job_active = True
+            for number, encoded in line_batches():
+                await write(encoded)
                 if number % 16 == 0 or number == PAGE_LINES:
                     print(f"Sent {number}/{PAGE_LINES} raster lines")
+                if saw_printing and latest_status is not None and (
+                    latest_status.state == 3 or latest_status.error != 0
+                ):
+                    raise RuntimeError(f"Printer reported failure: {latest_status}")
             await send(END)
-            job_open = False
+            submitted_at = time.monotonic()
+            print(f"Submitted in {submitted_at - started_at:.1f}s")
 
-            async def wait_for_completion() -> None:
-                while True:
-                    status = await asyncio.wait_for(status_events.get(), timeout=3.0)
-                    if status.state == 3 or status.error != 0:
-                        raise RuntimeError(f"Printer reported failure: {status}")
-                    if saw_printing and status.state == 0:
-                        return
-                    if status.state != 1:
-                        await send(STATUS_REQUEST)
-
-            await asyncio.wait_for(wait_for_completion(), timeout=args.print_timeout)
-            print("BLE print completed; printer returned to idle")
+            await asyncio.wait_for(
+                wait_for_completion(status_events, lambda: send(STATUS_REQUEST)),
+                timeout=args.print_timeout,
+            )
+            job_active = False
+            print(f"BLE print completed in {time.monotonic() - started_at:.1f}s; printer returned to idle")
         except BaseException:
-            if job_open and client.is_connected:
+            if job_active and client.is_connected:
                 try:
                     await send(CANCEL)
                 except Exception:
                     pass
             raise
         finally:
-            await client.stop_notify(characteristic)
+            if client.is_connected:
+                try:
+                    await client.stop_notify(characteristic)
+                except Exception:
+                    pass
 
 
 def parse_args() -> argparse.Namespace:
@@ -231,13 +279,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scan-timeout", type=float, default=12.0)
     parser.add_argument("--print-timeout", type=float, default=45.0)
     parser.add_argument("--density", type=int, default=64)
-    parser.add_argument("--chunk-size", type=int, default=20)
+    parser.add_argument("--chunk-size", type=int, help="Override negotiated MTU-based write size")
     parser.add_argument("--dry-run", action="store_true", help="Check frames without Bluetooth")
     args = parser.parse_args()
     if not 1 <= args.density <= 100:
         parser.error("--density must be 1..100")
-    if not 1 <= args.chunk_size <= 20:
-        parser.error("--chunk-size must be 1..20 for a baseline BLE MTU")
+    if args.chunk_size is not None and not 1 <= args.chunk_size <= 512:
+        parser.error("--chunk-size must be 1..512")
+    if args.scan_timeout <= 0 or args.print_timeout <= 0:
+        parser.error("timeouts must be positive")
     return args
 
 
@@ -245,10 +295,9 @@ def main() -> None:
     args = parse_args()
     if args.dry_run:
         lines = list(page())
-        dots = sum(byte.bit_count() for line in lines for byte in line)
-        assert len(lines) == PAGE_LINES
-        assert all(len(line) == LINE_BYTES for line in lines)
-        assert dots > 1000
+        dots = sum(bin(byte).count("1") for line in lines for byte in line)
+        if len(lines) != PAGE_LINES or any(len(line) != LINE_BYTES for line in lines) or dots <= 1000:
+            raise RuntimeError("Invalid test page raster")
         print(f"Valid test page: {len(lines)} lines, {LINE_BYTES} bytes/line, {dots} black dots")
         return
     asyncio.run(print_over_ble(args))
