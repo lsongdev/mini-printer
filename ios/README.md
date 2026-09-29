@@ -1,5 +1,7 @@
 # Mini Printer for iOS
 
+![Mini Printer app icon](MiniPrinter/Resources/Assets.xcassets/AppIcon.appiconset/icon-60@3x.png)
+
 A native SwiftUI client for the ESP32 Mini Printer. It discovers the printer with CoreBluetooth, shows paper/battery/print-head status, and prints a photo or a built-in test page through the repository's [MP v1 protocol](../docs/protocol.md).
 
 ## Requirements
@@ -26,6 +28,7 @@ MiniPrinter/Sources/
   Protocol/   MP frame and status encoding/decoding
   Printing/   384-dot monochrome raster generation
 MiniPrinter/Resources/  App icon
+Design/                Full-resolution app icon artwork
 MiniPrinterTests/       Protocol and raster tests
 project.yml             XcodeGen project definition
 ```
