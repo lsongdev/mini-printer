@@ -1,36 +1,11 @@
-> 来源：[飞书原文](https://lsongdev.feishu.cn/docx/NWnld8dLXoatstxhNJAc8qV2nOe)
-
-**关于飞书文档如何使用：**
-
-文档可以点击右上角的搜索图标搜索关键词的哦！
-
-遇到有疑问的地方，可以选取后添加评论！！这边看到会答复哦！
-
-**STM32版本打印机的资料链接：在文档的最后哦**
-
-[**Mini打印机学习返学费活动来啦！！！**](https://mp.weixin.qq.com/s?__biz=MzIzNjc3ODQzMw==&mid=2247484722&idx=1&sn=6763b95f8000bf5c8baedfb1096fb51a&chksm=e8d3e39cdfa46a8ab34c793f21bacf70f444a11214e76c01346dfaa9b1d1e28644d1deecd65f&token=1363770502&lang=zh_CN#rd)
-
-## 课程项目介绍
+# Mini打印机资料导航
 
 Mini打印机，这是一台可以打印你手机中任何东西的设备，学习中打印错题、单词、生活中打印标签、留言、贴纸、照片等等，可玩性非常高。
 
-<grid cols="2">
-<column>
 ![image](assets/09-navigation/image_1.png)
-</column>
-<column>
 ![image](assets/09-navigation/image_2.png)
-</column>
-</grid>
-
-<grid cols="2">
-<column>
 ![image](assets/09-navigation/image_3.png)
-</column>
-<column>
 ![image](assets/09-navigation/image_4.png)
-</column>
-</grid>
 
 **视频课程入口：**
 
@@ -314,37 +289,19 @@ https://github.com/xinnyu/MiniPrinter
 
 **iOS应用，直接在App Store搜索迷你打印机，然后下载安装即可**
 
-<grid cols="2">
-<column>
 ![image](assets/09-navigation/image_23.png)
-</column>
-<column>
 ![image](assets/09-navigation/image_24.png)
-</column>
-</grid>
 
 APP内容展示：
 
-<grid cols="2">
-<column>
 ![image](assets/09-navigation/image_25.png)
-</column>
-<column>
 ![image](assets/09-navigation/image_26.png)
-</column>
-</grid>
 
 # 
 
 # 八、附加部分：STM32版本
 
-<grid cols="2">
-<column>
 ![image](assets/09-navigation/image_27.png)
-</column>
-<column>
 ![image](assets/09-navigation/image_28.png)
-</column>
-</grid>
 
 飞书链接：[Mini打印机-STM32版本](https://lsongdev.feishu.cn/docx/RWaHdWTHvoVIYaxNrGUcwCPzn0c)    密码：j^k556u7
