@@ -146,8 +146,9 @@ bool wifi_manager_init()
             1,
             nullptr) != pdPASS)
     {
+        // Captive DNS is a convenience. HTTP and TCP remain useful even if
+        // the task cannot be created.
         Serial.println("Failed to start captive DNS task");
-        return false;
     }
 
     initialized = true;
