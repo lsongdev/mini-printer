@@ -40,10 +40,19 @@ pio test -e native
 
 ## BLE
 
-The default `esp32dev` build currently sets `BLE_ENABLED=0` and excludes the
-BLE source file to isolate Wi-Fi behavior. Build `esp32dev_ble` to restore the
-BLE transport. The default build does not initialize Bluetooth or advertise
-a BLE service.
+The default `esp32dev` build enables BLE, Wi-Fi AP+STA, HTTP, and TCP together.
+It starts a BLE-only controller and releases unused Bluetooth Classic controller
+memory before initializing the BLE stack.
+
+ESP32 shares one 2.4 GHz radio between Wi-Fi and Bluetooth, so the controller
+time-slices radio access. Espressif lists Wi-Fi STA plus BLE as stable, while
+SoftAP with a connected client plus BLE is supported with reduced stability.
+On this printer, the earlier combined build also started the unused dual-mode
+Bluetooth controller. Its Wi-Fi connected heap was about 32 KB with an 18 KB
+largest allocation; selecting BLE-only raised these to about 52 KB and 33 KB.
+In a concurrent run, 60/60 LAN HTTP requests and 60/60 BLE status requests
+succeeded; a BLE test page printed and returned to idle. SoftAP access from a
+phone remained stable during the same testing session.
 
 The firmware exposes the existing service and characteristic UUIDs. Writes use
 the framed print protocol documented in [`../docs/protocol.md`](../docs/protocol.md). The same

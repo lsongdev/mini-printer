@@ -12,6 +12,7 @@
 #include <BLE2902.h>
 #include <BLEDevice.h>
 #include <atomic>
+#include <esp_bt.h>
 #include <freertos/semphr.h>
 
 namespace {
@@ -154,6 +155,24 @@ class CharacteristicCallbacks : public BLECharacteristicCallbacks
 
 void init_ble_transport()
 {
+    // Arduino's btStart() defaults to BTDM in the prebuilt ESP32 SDK.
+    // Start a BLE-only controller before BLEDevice::init() so unused Classic
+    // Bluetooth memory is available to Wi-Fi and the HTTP server.
+    esp_err_t result = esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT);
+    if (result == ESP_OK)
+    {
+        esp_bt_controller_config_t config = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
+        config.mode = ESP_BT_MODE_BLE;
+        result = esp_bt_controller_init(&config);
+    }
+    if (result == ESP_OK)
+        result = esp_bt_controller_enable(ESP_BT_MODE_BLE);
+    if (result != ESP_OK)
+    {
+        Serial.printf("Failed to initialize BLE controller: %s\n", esp_err_to_name(result));
+        return;
+    }
+
     characteristic_mutex = xSemaphoreCreateMutex();
     if (characteristic_mutex == nullptr)
     {
@@ -182,7 +201,8 @@ void init_ble_transport()
     service->start();
     BLEDevice::startAdvertising();
 
-    Serial.println("BLE transport ready");
+    Serial.printf("BLE transport ready: heap=%u, largest=%u\n",
+                  ESP.getFreeHeap(), ESP.getMaxAllocHeap());
 }
 
 bool ble_transport_connected()

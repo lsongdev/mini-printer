@@ -96,10 +96,19 @@ void connect_saved_network()
     WiFi.begin(network.ssid, network.password);
 }
 
-void on_wifi_event(arduino_event_id_t event)
+void on_wifi_event(arduino_event_id_t event, arduino_event_info_t info)
 {
     switch (event)
     {
+    case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+        Serial.printf("Wi-Fi STA ready: IP=%s, heap=%u, largest=%u\n",
+                      WiFi.localIP().toString().c_str(),
+                      ESP.getFreeHeap(), ESP.getMaxAllocHeap());
+        break;
+    case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+        Serial.printf("Wi-Fi STA disconnected: reason=%u, heap=%u\n",
+                      info.wifi_sta_disconnected.reason, ESP.getFreeHeap());
+        break;
     case ARDUINO_EVENT_WIFI_AP_STACONNECTED:
         Serial.println("Wi-Fi AP client connected");
         break;
