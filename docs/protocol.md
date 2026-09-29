@@ -1,7 +1,7 @@
 # Print Protocol
 
 The print protocol is a small framed byte-stream protocol. It is deliberately
-independent of BLE packet boundaries and TCP reads.
+independent of BLE packet boundaries, TCP reads, and HTTP request chunks.
 
 This is a new wire protocol. It intentionally does not preserve the legacy
 "one 48-byte GATT write equals one raster line" behavior.
@@ -41,7 +41,22 @@ LINE
 END
 ```
 
-The parser accepts frames split across any number of BLE writes or TCP reads.
+The parser accepts frames split across any number of BLE writes, TCP reads, or
+HTTP body chunks.
+
+## Transports
+
+The same MP byte stream is accepted through:
+
+- BLE GATT writes
+- raw TCP port `9100`
+- `POST /api/print` with `Content-Type: application/octet-stream`
+
+TCP port 9100 is a project-specific MP endpoint. It is not IPP, AirPrint,
+JetDirect/RAW printer data, or ESC/POS.
+
+HTTP is only a carrier for the existing stream. The request handler does not
+translate images or create a second print protocol.
 
 ## Status payload
 
@@ -74,10 +89,11 @@ Printer errors:
 
 ## Sessions and backpressure
 
-A transport connection owns a job from `BEGIN` until `END` or `CANCEL`.
-Only one session can own the printer at a time, so BLE and Wi-Fi jobs cannot be
-interleaved.
+A transport connection or HTTP request owns a job from `BEGIN` until `END`
+or `CANCEL`. Only one session can own the printer at a time, so BLE, HTTP, and
+TCP jobs cannot be interleaved.
 
 The firmware uses a bounded 16-line FreeRTOS queue. BLE uses acknowledged GATT
-writes and TCP uses normal stream flow control, allowing producers to slow down
-instead of requiring a large image buffer in the ESP32.
+writes, TCP uses stream flow control, and HTTP feeds the request body to the
+parser incrementally. None of these paths requires buffering a complete image
+inside the ESP32.

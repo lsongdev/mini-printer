@@ -6,18 +6,20 @@
   <img src="printer.png" width="680" alt="Mini Printer internal assembly">
 </p>
 
-This repository contains the firmware, test client, hardware notes, and mobile client source code.
+This repository contains the firmware, test client, hardware notes, and mobile
+client source code.
 
 ## Project layout
 
 | Path | Contents |
 | --- | --- |
-| [`firmware/`](firmware/) | PlatformIO firmware: hardware drivers, print queue, protocol parser, BLE and Wi-Fi transports |
+| [`firmware/`](firmware/) | PlatformIO firmware: hardware drivers, print queue, protocol parser, BLE, TCP, Wi-Fi AP+STA, and embedded Web UI |
 | [`python/`](python/) | BLE test-page client and protocol tests |
 | [`docs/`](docs/) | Hardware notes, architecture, and [print protocol](docs/protocol.md) |
 | [`android/`](android/) · [`ios/`](ios/) · [`wxapp/`](wxapp/) | Client source code for other platforms |
 
-`firmware/` is a regular directory in this repository; no Git submodule setup is needed.
+`firmware/` is a regular directory in this repository; no Git submodule setup
+is needed.
 
 ## Build and test
 
@@ -44,4 +46,13 @@ python3 python/main.py
 python3 -m unittest discover -s python -p 'test_*.py'
 ```
 
-Print data uses the project's compact `MP` frame protocol. The firmware also accepts the same protocol over TCP port 9100 on its Wi-Fi SoftAP; this is not IPP or AirPrint. See [`docs/protocol.md`](docs/protocol.md) for frame fields and status codes.
+Print data uses the project's compact `MP` frame protocol. The firmware accepts
+the same protocol over BLE, raw TCP port `9100`, and HTTP `POST /api/print`.
+
+Wi-Fi runs as AP+STA. Connecting to `Mini-Printer-XXXX` opens an offline setup
+and print page on port 80. The page can join another Wi-Fi network while keeping
+the setup AP available, and can rasterize an image in the browser for printing.
+
+The TCP endpoint is not IPP or AirPrint. See [`docs/protocol.md`](docs/protocol.md)
+for frame fields and status codes, and [`firmware/README.md`](firmware/README.md)
+for the network and HTTP API.

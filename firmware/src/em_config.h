@@ -7,13 +7,17 @@
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
 #define BLE_NAME "Mini-Printer"
 
-// Wi-Fi transport: development firmware starts a SoftAP and accepts the
-// same print protocol over a TCP stream.
-#define WIFI_PRINT_ENABLED 1
+// Wi-Fi runs in AP+STA mode. The AP is always available as a setup and
+// recovery path while STA credentials are stored in NVS after a successful
+// connection.
+#define WIFI_ENABLED 1
 #define WIFI_AP_SSID "Mini-Printer"
 #define WIFI_AP_PASSWORD ""
+#define WIFI_HTTP_PORT 80
 #define WIFI_PRINT_PORT 9100
 #define WIFI_CLIENT_IDLE_TIMEOUT_MS 30000
+#define WIFI_CONNECT_TIMEOUT_MS 15000
+#define WIFI_PREFS_NAMESPACE "wifi"
 
 #define DEFAULT_PRINT_DENSITY 64
 #define PRINT_QUEUE_DEPTH 16

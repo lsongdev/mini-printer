@@ -8,8 +8,10 @@
 #include "hal/em_indicator.h"
 #include "hal/em_paper.h"
 #include "hal/em_printer.h"
+#include "network/web_server.h"
+#include "network/wifi_manager.h"
 #include "transport/ble_transport.h"
-#include "transport/wifi_transport.h"
+#include "transport/tcp_transport.h"
 
 #include <atomic>
 #include <math.h>
@@ -173,7 +175,12 @@ void init_task()
 
     init_key();
     init_ble_transport();
-    init_wifi_transport();
+
+    if (wifi_manager_init())
+    {
+        init_tcp_transport();
+        init_web_server();
+    }
 
     xTaskCreate(
         task_report,

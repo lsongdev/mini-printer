@@ -1,8 +1,8 @@
-#include "wifi_transport.h"
+#include "tcp_transport.h"
 
 #include "em_config.h"
 
-#if WIFI_PRINT_ENABLED
+#if WIFI_ENABLED
 
 #include "core/print_service.h"
 #include "protocol/print_protocol.h"
@@ -18,7 +18,7 @@ typedef struct {
     uint32_t session;
     WiFiClient *client;
     bool job_open;
-} wifi_context_t;
+} tcp_context_t;
 
 uint32_t next_session()
 {
@@ -46,8 +46,8 @@ bool handle_command(
     const print_protocol_command_t *command,
     void *context_ptr)
 {
-    wifi_context_t *context =
-        static_cast<wifi_context_t *>(context_ptr);
+    tcp_context_t *context =
+        static_cast<tcp_context_t *>(context_ptr);
 
     if (command->type == PRINT_PROTOCOL_STATUS_REQUEST)
         return send_status(*context->client);
@@ -69,10 +69,10 @@ bool handle_command(
     return true;
 }
 
-void wifi_task(void *)
+void tcp_task(void *)
 {
     server.begin();
-    Serial.printf("Wi-Fi print TCP server listening on %d\n", WIFI_PRINT_PORT);
+    Serial.printf("Print TCP server listening on %d\n", WIFI_PRINT_PORT);
 
     for (;;)
     {
@@ -85,7 +85,7 @@ void wifi_task(void *)
 
         client.setNoDelay(true);
 
-        wifi_context_t context = {
+        tcp_context_t context = {
             next_session(),
             &client,
             false,
@@ -94,7 +94,7 @@ void wifi_task(void *)
         print_protocol_parser_t parser;
         print_protocol_init(&parser, handle_command, &context);
 
-        Serial.printf("Wi-Fi client connected, session=%u\n", context.session);
+        Serial.printf("TCP client connected, session=%u\n", context.session);
 
         bool accepted = true;
         uint8_t buffer[128];
@@ -105,9 +105,10 @@ void wifi_task(void *)
             const int available = client.available();
             if (available <= 0)
             {
-                if (millis() - last_activity >= WIFI_CLIENT_IDLE_TIMEOUT_MS)
+                if (static_cast<uint32_t>(millis() - last_activity) >=
+                    WIFI_CLIENT_IDLE_TIMEOUT_MS)
                 {
-                    Serial.println("Wi-Fi client idle timeout");
+                    Serial.println("TCP client idle timeout");
                     break;
                 }
 
@@ -117,7 +118,7 @@ void wifi_task(void *)
 
             const size_t wanted =
                 available < static_cast<int>(sizeof(buffer))
-                    ? available
+                    ? static_cast<size_t>(available)
                     : sizeof(buffer);
 
             const int received = client.read(buffer, wanted);
@@ -143,47 +144,16 @@ void wifi_task(void *)
 
         client.stop();
 
-        Serial.printf("Wi-Fi client disconnected, session=%u\n", context.session);
+        Serial.printf("TCP client disconnected, session=%u\n", context.session);
     }
 }
 } // namespace
 
-void init_wifi_transport()
+void init_tcp_transport()
 {
-    char ssid[33];
-    const uint16_t suffix =
-        static_cast<uint16_t>(ESP.getEfuseMac() & 0xFFFFu);
-
-    snprintf(
-        ssid,
-        sizeof(ssid),
-        "%s-%04X",
-        WIFI_AP_SSID,
-        suffix);
-
-    WiFi.mode(WIFI_AP);
-    WiFi.setSleep(false);
-
-    bool started = false;
-    if (strlen(WIFI_AP_PASSWORD) >= 8)
-        started = WiFi.softAP(ssid, WIFI_AP_PASSWORD);
-    else
-        started = WiFi.softAP(ssid);
-
-    if (!started)
-    {
-        Serial.println("Failed to start Wi-Fi AP");
-        return;
-    }
-
-    Serial.printf(
-        "Wi-Fi AP ready: %s, IP=%s\n",
-        ssid,
-        WiFi.softAPIP().toString().c_str());
-
     xTaskCreate(
-        wifi_task,
-        "WiFiPrint",
+        tcp_task,
+        "TCPPrint",
         6144,
         nullptr,
         1,
@@ -192,7 +162,7 @@ void init_wifi_transport()
 
 #else
 
-void init_wifi_transport()
+void init_tcp_transport()
 {
 }
 

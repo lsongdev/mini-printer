@@ -2,22 +2,30 @@
 
 ESP32 firmware for a 384-dot thermal mini printer.
 
-The firmware keeps hardware control, print scheduling, protocol parsing, and
-network transports separate so the printer core is independent of BLE or Wi-Fi.
+The firmware keeps hardware control, print scheduling, protocol parsing,
+network management, and transports separate. BLE, TCP, and HTTP all converge
+on the same print protocol and print service.
 
 ## Architecture
 
 ```text
-BLE ─────┐
-         ├── print protocol ── print service ── printer HAL
-Wi-Fi ───┘                         │
-                              FreeRTOS queue
+BLE ───────────┐
+TCP :9100 ─────┼── MP protocol ── print service ── printer HAL
+HTTP /api/print┘                      │
+                                  FreeRTOS queue
+
+Wi-Fi AP+STA ── wifi_manager
+                  ├── captive DNS
+                  ├── mDNS
+                  ├── TCP :9100
+                  └── HTTP :80
 ```
 
 - `hal/` owns GPIO, SPI, motor, sensors, and print-head timing.
 - `core/` owns print jobs, session ownership, and the bounded FreeRTOS queue.
 - `protocol/` parses a transport-independent byte stream.
-- `transport/` adapts BLE and Wi-Fi/TCP to the same protocol.
+- `transport/` adapts BLE and raw TCP to the same MP protocol.
+- `network/` owns Wi-Fi state, captive setup, and the HTTP UI/API.
 
 The print service streams lines through a 16-entry queue instead of buffering a
 whole image in RAM.
@@ -28,19 +36,21 @@ This is a PlatformIO project:
 
 ```sh
 pio run
+pio test -e native
 ```
 
 ## BLE
 
 The firmware exposes the existing service and characteristic UUIDs. Writes use
-the framed print protocol documented in [docs/protocol.md](docs/protocol.md).
-The same characteristic returns/notifications status frames.
+the framed print protocol documented in [`../docs/protocol.md`](../docs/protocol.md). The same
+characteristic returns/notifications status frames.
 
 ## Wi-Fi
 
-Wi-Fi printing is enabled by default as a SoftAP.
+Wi-Fi runs in `WIFI_AP_STA` mode. The setup/recovery SoftAP remains available
+even after the printer joins another network.
 
-The SSID is:
+The AP SSID is:
 
 ```text
 Mini-Printer-XXXX
@@ -49,7 +59,49 @@ Mini-Printer-XXXX
 where `XXXX` is derived from the ESP32 ID. Development builds use an open AP
 unless `WIFI_AP_PASSWORD` is configured.
 
-The printer accepts the same protocol over TCP port `9100`.
+The printer stores STA credentials only after a successful connection. They are
+kept in NVS through `Preferences`. Failed setup attempts are not persisted.
+
+The printer exposes:
+
+- HTTP on port `80`
+- MP protocol over raw TCP on port `9100`
+- mDNS as `mini-printer-xxxx.local`
+- captive DNS on the setup AP
+
+The TCP service is not IPP, AirPrint, JetDirect, or ESC/POS. It carries the
+project's MP framing protocol.
+
+## Web UI
+
+Opening the printer over HTTP shows a fully offline page embedded in firmware.
+It does not depend on a CDN or Internet access.
+
+The page can:
+
+- show printer and Wi-Fi status
+- scan nearby Wi-Fi networks
+- connect to or forget a saved Wi-Fi network
+- select an image and print it
+
+Image rasterization happens in the browser. Canvas scales the source image to
+384 dots, converts it to a 1-bit raster, and sends the resulting MP stream to
+`POST /api/print`. The ESP32 therefore does not need PNG/JPEG decoders or a
+large page buffer.
+
+### HTTP API
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/` | Embedded setup and print page |
+| `GET` | `/api/status` | Printer and Wi-Fi status |
+| `GET` | `/api/wifi/scan` | Scan nearby networks |
+| `POST` | `/api/wifi/connect` | Connect using URL-encoded `ssid` and `password` |
+| `POST` | `/api/wifi/forget` | Forget the saved STA network |
+| `POST` | `/api/print` | Stream an `application/octet-stream` MP print job |
+
+`/api/print` feeds request chunks directly into the existing MP parser. It does
+not buffer the entire print job in firmware.
 
 ## Hardware
 
