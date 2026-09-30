@@ -70,6 +70,11 @@ final class PrinterStore {
         catch { errorMessage = error.localizedDescription }
     }
 
+    func printText(_ text: NSAttributedString) async {
+        do { await printLines(try PrintRasterizer.textLines(from: text)) }
+        catch { errorMessage = error.localizedDescription }
+    }
+
     func printTestPage() async {
         await printLines(PrintRasterizer.testPageLines())
     }

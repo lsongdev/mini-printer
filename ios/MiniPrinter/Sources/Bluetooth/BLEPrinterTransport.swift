@@ -40,6 +40,8 @@ final class BLEPrinterTransport: NSObject, @preconcurrency CBCentralManagerDeleg
     private var central: CBCentralManager!
     private var peripherals: [UUID: CBPeripheral] = [:]
     private var devices: [DiscoveredPrinter] = []
+    private var seenDuringScan: Set<UUID> = []
+    private var scanTask: Task<Void, Never>?
     private var peripheral: CBPeripheral?
     private var characteristic: CBCharacteristic?
     private var scanRequested = false
@@ -57,20 +59,37 @@ final class BLEPrinterTransport: NSObject, @preconcurrency CBCentralManagerDeleg
         guard central.state == .poweredOn else {
             return
         }
+        scanTask?.cancel()
         central.stopScan()
-        devices.removeAll()
-        peripherals.removeAll()
-        onDevices?([])
+        seenDuringScan.removeAll()
         // The current ESP32 advertisement contains the printer name but does
         // not advertise its service UUID, so foreground discovery uses the name.
         central.scanForPeripherals(withServices: nil)
         onScanning?(true)
+        scanTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(8))
+            guard !Task.isCancelled else { return }
+            self?.finishScan()
+        }
     }
 
     func stopScan() {
         scanRequested = false
+        scanTask?.cancel()
+        scanTask = nil
         central.stopScan()
         onScanning?(false)
+    }
+
+    private func finishScan() {
+        guard scanRequested else { return }
+        stopScan()
+        let visible = devices.filter { seenDuringScan.contains($0.id) }
+        if visible != devices {
+            devices = visible
+            onDevices?(devices)
+        }
+        peripherals = peripherals.filter { seenDuringScan.contains($0.key) }
     }
 
     func connect(to id: UUID) throws {
@@ -145,6 +164,8 @@ final class BLEPrinterTransport: NSObject, @preconcurrency CBCentralManagerDeleg
         if central.state == .poweredOn {
             if scanRequested { startScan() }
         } else {
+            scanTask?.cancel()
+            scanTask = nil
             onScanning?(false)
             if ready || peripheral != nil { clearConnection() }
         }
@@ -159,10 +180,14 @@ final class BLEPrinterTransport: NSObject, @preconcurrency CBCentralManagerDeleg
         let name = (advertisementData[CBAdvertisementDataLocalNameKey] as? String) ?? peripheral.name
         guard let name, name.hasPrefix("Mini-Printer") else { return }
         peripherals[peripheral.identifier] = peripheral
+        seenDuringScan.insert(peripheral.identifier)
         let item = DiscoveredPrinter(id: peripheral.identifier, name: name, rssi: RSSI.intValue)
-        devices.removeAll { $0.id == item.id }
-        devices.append(item)
-        devices.sort { $0.rssi > $1.rssi }
+        if let index = devices.firstIndex(where: { $0.id == item.id }) {
+            guard devices[index].name != item.name else { return }
+            devices[index] = item
+        } else {
+            devices.append(item)
+        }
         onDevices?(devices)
     }
 

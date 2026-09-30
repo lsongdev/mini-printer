@@ -2,7 +2,7 @@
 
 ![Mini Printer app icon](MiniPrinter/Resources/Assets.xcassets/AppIcon.appiconset/icon-60@3x.png)
 
-A native SwiftUI client for the ESP32 Mini Printer. It discovers the printer with CoreBluetooth, shows paper/battery/print-head status, and prints a photo or a built-in test page through the repository's [MP v1 protocol](../docs/protocol.md).
+A native SwiftUI client for the ESP32 Mini Printer. It discovers the printer with CoreBluetooth, shows paper/battery/print-head status, and prints text, a photo, or a built-in test page through the repository's [MP v1 protocol](../docs/protocol.md).
 
 ## Requirements
 
@@ -33,7 +33,7 @@ MiniPrinterTests/       Protocol and raster tests
 project.yml             XcodeGen project definition
 ```
 
-The interface uses SwiftUI controls and the system Photos picker. The transport sends acknowledged GATT writes in batches of eight raster lines, matching the Python test client. No third-party runtime packages are required.
+The interface uses SwiftUI controls, a UIKit rich text editor, and the system Photos picker. Select text to change its weight or size, or align the current paragraph. With no selection, weight and size apply to text typed next. Swipe down to dismiss the keyboard. Text is laid out on the phone and converted to the same 384-dot raster lines as photos, so the firmware and MP protocol need no text-specific commands. The formatted draft is saved on the phone. The transport sends acknowledged GATT writes in batches of eight raster lines, matching the Python test client. No third-party runtime packages are required.
 
 Run tests with:
 

@@ -5,11 +5,15 @@ enum PrintRasterizer {
     enum Error: LocalizedError {
         case invalidImage
         case renderingFailed
+        case emptyText
+        case textTooLong
 
         var errorDescription: String? {
             switch self {
             case .invalidImage: "The selected image cannot be printed."
             case .renderingFailed: "The image could not be converted for the printer."
+            case .emptyText: "Enter some text before printing."
+            case .textTooLong: "The text is too long for one print job. Shorten it and try again."
             }
         }
     }
@@ -41,7 +45,46 @@ enum PrintRasterizer {
             image.draw(in: imageRect)
         }
         guard let cgImage = normalized.cgImage else { throw Error.renderingFailed }
+        return try rasterLines(from: cgImage, height: height)
+    }
 
+    static func textLines(from text: NSAttributedString) throws -> [Data] {
+        guard !text.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { throw Error.emptyText }
+
+        let width = PrinterWireProtocol.width
+        let inset: CGFloat = 16
+        let contentWidth = CGFloat(width) - inset * 2
+        let attributed = NSMutableAttributedString(attributedString: text)
+        attributed.addAttribute(.foregroundColor, value: UIColor.black, range: NSRange(location: 0, length: attributed.length))
+        let options: NSStringDrawingOptions = [.usesLineFragmentOrigin, .usesFontLeading]
+        let bounds = attributed.boundingRect(
+            with: CGSize(width: contentWidth, height: .greatestFiniteMagnitude),
+            options: options,
+            context: nil
+        )
+        let height = Int(ceil(bounds.height + inset * 2))
+        guard height <= maximumLines else { throw Error.textTooLong }
+
+        let size = CGSize(width: width, height: height)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+        let image = UIGraphicsImageRenderer(size: size, format: format).image { context in
+            UIColor.white.setFill()
+            context.fill(CGRect(origin: .zero, size: size))
+            attributed.draw(
+                with: CGRect(x: inset, y: inset, width: contentWidth, height: bounds.height),
+                options: options,
+                context: nil
+            )
+        }
+        guard let cgImage = image.cgImage else { throw Error.renderingFailed }
+        return try rasterLines(from: cgImage, height: height)
+    }
+
+    private static func rasterLines(from cgImage: CGImage, height: Int) throws -> [Data] {
+        let width = PrinterWireProtocol.width
+        let size = CGSize(width: width, height: height)
         var gray = [UInt8](repeating: 255, count: width * height)
         let rendered = gray.withUnsafeMutableBytes { buffer in
             guard let context = CGContext(

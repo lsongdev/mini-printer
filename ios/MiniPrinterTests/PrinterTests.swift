@@ -45,4 +45,64 @@ final class PrinterTests: XCTestCase {
         XCTAssertEqual(lines[0], Data(repeating: 0xFF, count: 48), "first: \(Array(lines[0].prefix(8)))")
         XCTAssertEqual(lines[383], Data(repeating: 0, count: 48), "last: \(Array(lines[383].prefix(8)))")
     }
+
+    func testTextRasterWrapsAndKeepsMargins() throws {
+        let text = NSAttributedString(
+            string: String(repeating: "Hello, printer! 你好。", count: 8),
+            attributes: [.font: UIFont.systemFont(ofSize: 24)]
+        )
+        let lines = try PrintRasterizer.textLines(
+            from: text
+        )
+        XCTAssertGreaterThan(lines.count, 100)
+        XCTAssertTrue(lines.allSatisfy { $0.count == 48 })
+        XCTAssertTrue(lines.prefix(12).allSatisfy { $0.allSatisfy { $0 == 0 } })
+        XCTAssertTrue(lines.contains { $0.contains { $0 != 0 } })
+    }
+
+    func testTextRasterRejectsEmptyAndOversizedJobs() {
+        XCTAssertThrowsError(try PrintRasterizer.textLines(from: NSAttributedString(string: "  \n")))
+        XCTAssertThrowsError(try PrintRasterizer.textLines(
+            from: NSAttributedString(
+                string: Array(repeating: "long line", count: 200).joined(separator: "\n"),
+                attributes: [.font: UIFont.boldSystemFont(ofSize: 32)]
+            )
+        ))
+    }
+
+    @MainActor
+    func testRichTextStylesOnlySelectedRangeAndPersists() throws {
+        let suite = "printer-tests-\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let draft = RichTextDraft(defaults: defaults)
+        let view = UITextView()
+        draft.attach(view)
+        view.attributedText = NSAttributedString(
+            string: "Hello\nworld",
+            attributes: [.font: UIFont.systemFont(ofSize: 24)]
+        )
+        draft.contentChanged(in: view)
+        view.selectedRange = NSRange(location: 0, length: 5)
+        draft.updateSelection(from: view)
+        draft.toggleBold()
+        draft.setFontSize(32)
+        draft.setAlignment(.center)
+
+        let first = try XCTUnwrap(view.attributedText.attribute(.font, at: 0, effectiveRange: nil) as? UIFont)
+        let second = try XCTUnwrap(view.attributedText.attribute(.font, at: 6, effectiveRange: nil) as? UIFont)
+        XCTAssertTrue(first.fontDescriptor.symbolicTraits.contains(.traitBold))
+        XCTAssertEqual(first.pointSize, 32)
+        XCTAssertFalse(second.fontDescriptor.symbolicTraits.contains(.traitBold))
+        XCTAssertEqual(second.pointSize, 24)
+        let firstParagraph = try XCTUnwrap(view.attributedText.attribute(.paragraphStyle, at: 0, effectiveRange: nil) as? NSParagraphStyle)
+        let secondParagraph = view.attributedText.attribute(.paragraphStyle, at: 6, effectiveRange: nil) as? NSParagraphStyle
+        XCTAssertEqual(firstParagraph.alignment, .center)
+        XCTAssertNotEqual(secondParagraph?.alignment, .center)
+
+        let restored = RichTextDraft(defaults: defaults)
+        let restoredFont = try XCTUnwrap(restored.document.attribute(.font, at: 0, effectiveRange: nil) as? UIFont)
+        XCTAssertEqual(restoredFont.pointSize, 32)
+        XCTAssertTrue(restoredFont.fontDescriptor.symbolicTraits.contains(.traitBold))
+    }
 }

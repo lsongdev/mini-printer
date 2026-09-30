@@ -3,15 +3,19 @@ import SwiftUI
 
 struct PrinterScreen: View {
     @State private var store = PrinterStore()
+    @State private var textDraft = RichTextDraft()
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var isSubmittingText = false
 
     var body: some View {
         NavigationStack {
             Form {
                 printerSection
+                textSection
                 photoSection
                 printSection
             }
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Mini Printer")
             .toolbar {
                 if store.isPrinting { ProgressView() }
@@ -53,15 +57,18 @@ struct PrinterScreen: View {
                     .disabled(store.isPrinting)
             } else {
                 if store.devices.isEmpty {
-                    ContentUnavailableView(
-                        "No Printer Found",
-                        systemImage: "printer",
-                        description: Text(
-                            !store.bluetoothAvailable
-                                ? "Turn on Bluetooth to discover printers."
-                                : store.isScanning ? "Searching nearby…" : "Tap Scan to find your printer."
+                    if store.isScanning {
+                        Label("Searching nearby…", systemImage: "antenna.radiowaves.left.and.right")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Label(
+                            store.bluetoothAvailable
+                                ? "No printer found. Tap Scan to try again."
+                                : "Turn on Bluetooth to discover printers.",
+                            systemImage: "printer"
                         )
-                    )
+                        .foregroundStyle(.secondary)
+                    }
                 }
                 ForEach(store.devices) { device in
                     Button {
@@ -85,11 +92,76 @@ struct PrinterScreen: View {
                 Button {
                     store.scan()
                 } label: {
-                    Label(store.isScanning ? "Scan Again" : "Scan for Printers", systemImage: "arrow.clockwise")
+                    Label(store.isScanning ? "Scanning…" : "Scan for Printers", systemImage: "arrow.clockwise")
                 }
-                .disabled(!store.bluetoothAvailable || store.isConnecting)
+                .disabled(!store.bluetoothAvailable || store.isConnecting || store.isScanning)
             }
         }
+    }
+
+    private var textSection: some View {
+        Section("Text") {
+            RichTextEditor(draft: textDraft)
+                .frame(height: 150)
+
+            HStack(spacing: 8) {
+                Button { textDraft.toggleBold() } label: {
+                    Image(systemName: "bold")
+                }
+                .tint(textDraft.selectedBold ? .accentColor : .secondary)
+                .accessibilityLabel("Bold")
+
+                Menu {
+                    Button("Small · 18 pt") { textDraft.setFontSize(18) }
+                    Button("Medium · 24 pt") { textDraft.setFontSize(24) }
+                    Button("Large · 32 pt") { textDraft.setFontSize(32) }
+                } label: {
+                    Text("\(textDraft.selectedFontSize) pt")
+                }
+                .accessibilityLabel("Font size")
+
+                Spacer(minLength: 0)
+
+                alignmentButton("text.alignleft", alignment: .left, label: "Align left")
+                alignmentButton("text.aligncenter", alignment: .center, label: "Align center")
+                alignmentButton("text.alignright", alignment: .right, label: "Align right")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+
+            Text("Select text to format it. With no selection, styles apply to new text; alignment applies to the paragraph.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+
+            Button(action: submitText) {
+                if isSubmittingText {
+                    Label("Printing Text…", systemImage: "printer.fill")
+                } else {
+                    Label("Print Text", systemImage: "printer.fill")
+                }
+            }
+            .disabled(isSubmittingText || store.isPrinting)
+        }
+    }
+
+    @MainActor
+    private func submitText() {
+        guard !isSubmittingText && !store.isPrinting else { return }
+        textDraft.dismissKeyboard()
+        let document = textDraft.snapshot()
+        isSubmittingText = true
+        Task {
+            await store.printText(document)
+            isSubmittingText = false
+        }
+    }
+
+    private func alignmentButton(_ symbol: String, alignment: NSTextAlignment, label: String) -> some View {
+        Button { textDraft.setAlignment(alignment) } label: {
+            Image(systemName: symbol)
+        }
+        .tint(textDraft.selectedAlignment == alignment ? .accentColor : .secondary)
+        .accessibilityLabel(label)
     }
 
     private var photoSection: some View {
@@ -128,14 +200,14 @@ struct PrinterScreen: View {
             } label: {
                 Label("Print Photo", systemImage: "printer.fill")
             }
-            .disabled(!store.isConnected || store.photo == nil || store.isPrinting || store.status?.paperPresent == false)
+            .disabled(!store.isConnected || store.photo == nil || store.isPrinting || isSubmittingText || store.status?.paperPresent == false)
 
             Button {
                 Task { await store.printTestPage() }
             } label: {
                 Label("Print Test Page", systemImage: "doc.text")
             }
-            .disabled(!store.isConnected || store.isPrinting || store.status?.paperPresent == false)
+            .disabled(!store.isConnected || store.isPrinting || isSubmittingText || store.status?.paperPresent == false)
 
             if store.isPrinting {
                 LabeledContent("Submitted lines", value: "\(store.submittedLines)")

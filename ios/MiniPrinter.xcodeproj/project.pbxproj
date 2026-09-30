@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0BDF029BF7947B2B94F9743D /* RichTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35BE8D1F8512A933F5F6585C /* RichTextEditor.swift */; };
 		6D6D6E8640401B4ABF59B3A2 /* PrinterScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01A5F2775CA2BC0F9A0B670B /* PrinterScreen.swift */; };
 		9DC474CB6BCCAF30DCD238DF /* PrintRasterizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428B066A1D3FF906CE31BC16 /* PrintRasterizer.swift */; };
 		9FF364C6C42C32B8622D9B8B /* PrinterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EAB6B3F225C908D77277573 /* PrinterTests.swift */; };
@@ -31,6 +32,7 @@
 		01A5F2775CA2BC0F9A0B670B /* PrinterScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterScreen.swift; sourceTree = "<group>"; };
 		1500577D7DC3B0BD952B7B3C /* PrinterWireProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterWireProtocol.swift; sourceTree = "<group>"; };
 		2CA7AF44A5AC8726E06502F6 /* MiniPrinterTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = MiniPrinterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		35BE8D1F8512A933F5F6585C /* RichTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextEditor.swift; sourceTree = "<group>"; };
 		428B066A1D3FF906CE31BC16 /* PrintRasterizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrintRasterizer.swift; sourceTree = "<group>"; };
 		6BE30C9EEBC2F07FA4F3B478 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6EAB6B3F225C908D77277573 /* PrinterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrinterTests.swift; sourceTree = "<group>"; };
@@ -55,6 +57,7 @@
 			children = (
 				01A5F2775CA2BC0F9A0B670B /* PrinterScreen.swift */,
 				EA16BE6D7786E1FA2AA3E55D /* PrinterStore.swift */,
+				35BE8D1F8512A933F5F6585C /* RichTextEditor.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -235,6 +238,7 @@
 				6D6D6E8640401B4ABF59B3A2 /* PrinterScreen.swift in Sources */,
 				FB5A1C966AF80D7235397913 /* PrinterStore.swift in Sources */,
 				A0245F249058384351260DA0 /* PrinterWireProtocol.swift in Sources */,
+				0BDF029BF7947B2B94F9743D /* RichTextEditor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
