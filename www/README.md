@@ -44,6 +44,7 @@ requests are required to load application dependencies and shared styles.
 Enable **Settings → Pages → Source → GitHub Actions**. The `pages.yml` workflow
 tests the client and publishes `www/` on changes to `main` (or manual dispatch).
 All asset paths are relative, so the project URL `/mini-printer/` works without
-rewrites. The target URL is https://lsongdev.github.io/mini-printer/.
+rewrites. The site uses the account's existing custom domain:
+https://lsong.org/mini-printer/ (the default GitHub Pages URL redirects there).
 
 The repository is public so that GitHub Pages is available on the current plan.
