@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import htm from 'htm';
 import { Printer } from './lib/printer.js';
 import { textRaster, imageRaster, testRaster, drawRaster } from './lib/raster.js';
+import { FirmwarePanel } from './firmware-panel.js';
 
 const html = htm.bind(h);
 const REPO = 'https://github.com/lsongdev/mini-printer';
@@ -26,6 +27,7 @@ function App() {
   const [connecting, setConnecting] = useState(false);
   const [status, setStatus] = useState(null);
   const [printing, setPrinting] = useState(false);
+  const [flashing, setFlashing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState('');
   const [failure, setFailure] = useState(false);
@@ -40,7 +42,7 @@ function App() {
     }
   });
   const supported = !!navigator.bluetooth && window.isSecureContext;
-  const locked = printing || connecting;
+  const locked = printing || connecting || flashing;
 
   const raster = useMemo(() => {
     try {
@@ -108,7 +110,7 @@ function App() {
   return html`<div class="app-shell">
     <header class="site-header">
       <a class="brand" href="#" aria-label="Mini Printer 首页"><${PrinterIcon} /><strong>Mini Printer<span class="brand-dot">.</span></strong></a>
-      <nav aria-label="主导航"><a href="#workbench">开始打印</a><a href="#project">关于项目</a><a class="repo-link" href=${REPO} target="_blank" rel="noreferrer">GitHub ↗</a></nav>
+      <nav aria-label="主导航"><a href="#install">安装固件</a><a href="#workbench">开始打印</a><a class="about-link" href="#project">关于项目</a><a class="repo-link" href=${REPO} target="_blank" rel="noreferrer">GitHub ↗</a></nav>
     </header>
     <main>
       <section class="hero" aria-labelledby="hero-title">
@@ -121,6 +123,8 @@ function App() {
         <figure class="hero-visual"><div class="photo-label">THE LITTLE MACHINE BEHIND THE PAPER</div><img src="./assets/printer.png" alt="Mini Printer 的实际内部组装：ESP32 电路板、锂电池与热敏打印机构" width="680" height="680" fetchpriority="high"/><figcaption><span>01 / 从电路开始，向纸张延伸</span><span>MINI PRINTER</span></figcaption></figure>
       </section>
       <div class="spec-strip" aria-label="项目参数"><div><strong>384<span> dots</span></strong><span>细小的点，清晰的表达</span></div><div><strong>ESP32</strong><span>一颗芯片，连接灵感</span></div><div><strong>BLE <span>+ Wi-Fi</span></strong><span>无线连接，轻松打印</span></div><a href=${REPO} target="_blank" rel="noreferrer">从硬件到软件<br/><strong>全部开源 ↗</strong></a></div>
+
+      <${FirmwarePanel} blocked=${printing || connecting || Boolean(device)} onBusy=${setFlashing}/>
 
       <section id="workbench" class="workbench" aria-labelledby="workbench-title">
         <div class="section-heading"><div><p class="eyebrow">PLAY WITH PAPER</p><h2 id="workbench-title">你的纸上工作台<span>.</span></h2></div><p>写一点，选一张，然后打印。</p></div>

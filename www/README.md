@@ -39,6 +39,33 @@ actual print quality and radio behavior.
 Print content stays in the browser and goes directly to the printer. CDN
 requests are required to load application dependencies and shared styles.
 
+## Firmware installation
+
+The USB installation panel reads the public GitHub Releases API on page load,
+including daily prereleases. `lib/releases.js` selects `mini-printer-full.bin`
+(exactly 4 MiB) and `mini-printer-firmware.bin` (within the 0x1e0000-byte
+`min_spiffs` app slot). Assets without GitHub's SHA-256 digest are excluded.
+New releases appear without redeploying the website. No API token is embedded;
+rate limits and an empty release list have retry and GitHub download links.
+
+`lib/firmware.js` loads Espressif's pinned `esptool-js@0.7.0` ESM bundle on
+demand. It checks the image size and SHA-256 before opening the serial port,
+then checks for a classic ESP32 and at least 4 MiB Flash before writing.
+Full installation writes at `0x0` and resets settings/data; application updates
+write at `0x10000` and require the existing `min_spiffs` layout.
+
+Automatic download uses the GitHub asset API with `Accept: application/octet-stream`.
+If a network or CORS restriction blocks it, download the selected `.bin` and
+choose it in the local file picker. Local files must match the selected release's
+size and SHA-256. Selected firmware files are not uploaded.
+
+USB flashing requires HTTPS or localhost, Web Serial, and a data-capable USB
+cable. Use desktop Chrome or Edge; browsers without Web Serial can still download
+images. Finish printing and disconnect BLE before flashing; printing controls
+are disabled during flashing. After a full installation, configure Wi-Fi again
+through the printer's setup hotspot. Physical USB writes, reset behavior and
+printing after installation require hardware verification.
+
 ## GitHub Pages
 
 Enable **Settings → Pages → Source → GitHub Actions**. The `pages.yml` workflow

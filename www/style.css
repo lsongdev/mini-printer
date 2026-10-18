@@ -125,6 +125,34 @@ progress { display: block; width: 100%; height: 4px; margin-top: 12px; accent-co
 .test-description h3 { font-family: inherit; font-size: 17px; margin: 15px 0 10px; }
 .test-description p { font-size: 13px; color: var(--color-text-muted); }
 .browser-note { font-size: 10px; margin-top: 15px; color: var(--color-text-muted); }
+.firmware-section { padding-top: 78px; }
+.firmware-notice { padding: 14px 20px; background: #f1ede0; border: 1px solid #dfd6bf; font-size: 12px; color: #6e6142; margin-bottom: 18px; }
+.firmware-grid { display: grid; grid-template-columns: 1.25fr 1fr; border: 1px solid var(--color-border); }
+.firmware-panel { padding: 28px; min-width: 0; background: var(--color-surface); }
+.firmware-target { color: var(--color-primary); font-size: 12px; margin-bottom: 22px; }
+.firmware-fields { border: 0; margin: 0; padding: 0; min-width: 0; font-size: 12px; }
+.firmware-choices { display: grid; gap: 12px; margin: 24px 0; }
+.firmware-choices label { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--color-border); padding: 16px; cursor: pointer; }
+.firmware-choices input, .firmware-ack input { flex-shrink: 0; accent-color: var(--color-primary); width: 17px; height: 17px; margin-top: 3px; }
+.firmware-choices label:has(input:checked) { border-color: var(--color-primary); background: #eef1e9; }
+.firmware-choices strong { font-size: 13px; display: block; }
+.firmware-choices small, .firmware-local small { display: block; color: var(--color-text-muted); margin-top: 4px; line-height: 1.8; font-size: 11px; }
+.firmware-ack { display: flex; gap: 10px; font-size: 12px; margin-block: 20px; }
+.firmware-actions { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.firmware-actions .button { font-size: 12px; }
+.firmware-actions a, .firmware-meta, .firmware-guide > a { font-size: 11px; }
+.firmware-local { display: block; margin-top: 22px; }
+.firmware-local input { display: block; width: 100%; max-width: 100%; padding-block: 10px; min-height: 44px; }
+.firmware-meta { margin-top: 22px; color: var(--color-text-muted); overflow-wrap: anywhere; }
+.firmware-retry { color: var(--color-primary); background: transparent; border: 0; padding: 5px 8px; text-decoration: underline; }
+.firmware-guide { padding: 28px 32px; border-left: 1px solid var(--color-border); background: var(--color-surface-subtle); }
+.firmware-guide h3 { font-family: inherit; font-size: 23px; margin: 14px 0 25px; letter-spacing: -.04em; }
+.firmware-guide ol { padding-left: 20px; margin: 0 0 24px; }
+.firmware-guide li { padding-left: 8px; margin-bottom: 22px; font-size: 13px; }
+.firmware-guide li::marker { color: var(--color-primary); }
+.firmware-guide li p { font-size: 12px; line-height: 1.9; color: var(--color-text-muted); margin-top: 6px; }
+.firmware-progress > span { display: block; text-align: right; color: var(--color-text-muted); font-size: 11px; margin-top: 6px; }
+.firmware-progress pre { max-height: 240px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #efefe8; padding: 12px; font-size: 11px; }
 .project-section { margin-top: 80px; }
 .project-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-block: 1px solid var(--color-border); }
 .project-grid article { padding: 30px 28px; border-right: 1px solid var(--color-border); }
@@ -159,8 +187,8 @@ details p { padding: 0 0 20px; color: var(--color-text-muted); font-size: 12px; 
   :root { --page-gutter: 20px; }
   .site-header { min-height: 76px; gap: 12px; }
   .brand { font-size: 18px; gap: 7px; }
-  .site-header nav { gap: 16px; font-size: 11px; }
-  .site-header nav a:nth-child(2) { display: none; }
+  .site-header nav { gap: 12px; font-size: 11px; }
+  .site-header nav .about-link { display: none; }
   .repo-link { border: 0; padding: 0; }
   .hero { grid-template-columns: 1fr; padding: 40px 0 38px; gap: 32px; }
   .hero h1 { font-size: 62px; margin: 20px 0; }
@@ -176,6 +204,11 @@ details p { padding: 0 0 20px; color: var(--color-text-muted); font-size: 12px; 
   .spec-strip strong { font-size: 21px; }
   .spec-strip div > span { font-size: 10px; }
   .workbench { padding-top: 48px; }
+  .firmware-section { padding-top: 48px; }
+  .firmware-grid { grid-template-columns: 1fr; }
+  .firmware-panel, .firmware-guide { padding: 22px 16px; }
+  .firmware-guide { border-left: 0; border-top: 1px solid var(--color-border); }
+  .firmware-guide h3 { font-size: 21px; }
   .section-heading { display: block; margin-bottom: 22px; }
   .section-heading h2 { font-size: 27px; }
   .section-heading > p { margin-top: 9px; font-size: 12px; }

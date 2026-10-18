@@ -24,6 +24,31 @@ is needed.
 
 ## Build and test
 
+GitHub Actions builds and tests each push and pull request. Successful builds on
+`main` publish a `daily-YYYY-MM-DD` prerelease (Asia/Shanghai); later builds on
+the same day update that release. You can also trigger the workflow manually.
+Download firmware from [Releases](https://github.com/lsongdev/mini-printer/releases):
+
+- `mini-printer-install.zip`: all flashing files, instructions, source snapshot,
+  build information, and dependency notices.
+- `mini-printer-full.bin`: complete 4 MiB image, flashed at `0x0`; resets saved
+  Wi-Fi settings and all other data.
+- `mini-printer-firmware.bin`: application image at `0x10000`, for a printer
+  already using this project's `min_spiffs` partition layout.
+- `mini-printer-build-info.json` and `mini-printer-sha256sums.txt`: source commit,
+  dependency versions, and file hashes.
+
+The [project website](https://lsong.org/mini-printer/#install) can install release
+firmware over USB using Web Serial in desktop Chrome / Edge. It verifies SHA-256
+and checks the ESP32 chip and Flash capacity before writing. If automatic
+download is blocked, select the matching downloaded `.bin` in the local picker.
+
+From the repository root, use `make build`, `make test`, or `make package`.
+Packaging requires a clean checkout and a Python interpreter with PlatformIO
+installed (`make package PYTHON=/path/to/python`). For local validation with
+uncommitted changes, use `make package ALLOW_DIRTY=1`; metadata marks the package
+as dirty and its source snapshot contains only the committed files.
+
 After installing [PlatformIO Core](https://docs.platformio.org/en/latest/core/installation/index.html):
 
 ```sh

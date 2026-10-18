@@ -23,6 +23,7 @@ jobs:
           node-version: '22'
       - run: node --test www/tests/*.test.js
       - run: node --check www/app.js
+      - run: node --check www/firmware-panel.js
 
   deploy:
     needs: validate

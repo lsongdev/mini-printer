@@ -37,6 +37,12 @@ pio run
 pio test -e native
 ```
 
+From the repository root, `make package` builds the firmware and writes release
+assets to `dist/`. See the [root README](../README.md#build-and-test) for daily
+GitHub Releases, artifact descriptions, and local packaging options. The install
+archive includes `FLASHING.txt` with the exact offsets and commands. Use a full
+installation when migrating from firmware with a different partition layout.
+
 ## BLE
 
 The default `esp32dev` build enables BLE, Wi-Fi, HTTP, and TCP together. Normal operation uses STA only; AP+STA is enabled temporarily for provisioning and recovery.

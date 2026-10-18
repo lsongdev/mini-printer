@@ -5,6 +5,7 @@
 
 # Build outputs and dependencies
 .pio/
+/dist/
 node_modules/
 __pycache__/
 *.py[cod]
