@@ -17,6 +17,7 @@ client source code.
 | [`python/`](python/) | BLE test-page client and protocol tests |
 | [`docs/`](docs/) | Hardware notes, architecture, and [print protocol](docs/protocol.md) |
 | [`android/`](android/) · [`ios/`](ios/) · [`wxapp/`](wxapp/) | Client source code for other platforms |
+| [`www/`](www/) | Buildless Preact + HTM project website and Web Bluetooth print workbench; GitHub Pages deployment workflow |
 
 `firmware/` is a regular directory in this repository; no Git submodule setup
 is needed.
